@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import javax.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import me.lucas.kits.commons.loader.LoaderException;
 import me.lucas.kits.commons.loader.PropertiesLoader;
 import me.lucas.kits.commons.utils.Assert;
@@ -36,6 +38,11 @@ import me.lucas.kits.orm.redis.jedis.sharded.RedisClientImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.EmbeddedValueResolverAware;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringValueResolver;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPoolConfig;
@@ -47,13 +54,23 @@ import redis.clients.util.Sharded;
 
 /**
  * RedisClient连接池管理类.
- * 
+ *
  * @author yanghe
  * @since 1.0
  */
-public class RedisClientPool {
+@Slf4j
+@Component
+public class RedisClientPool implements EmbeddedValueResolverAware {
+    private static StringValueResolver STRING_VALUE_RESOLVER;
+
+    private RedisClientPool() {}
+
     /** RedisClientPool. */
-    public static final RedisClientPool POOL = new RedisClientPool();
+    private static final RedisClientPool POOL = new RedisClientPool();
+
+    public static RedisClientPool getInstance() {
+        return POOL;
+    }
 
     public static final String MAIN_REDIS = "/redis.properties";
 
@@ -65,14 +82,48 @@ public class RedisClientPool {
     private static final int DEFAULT_MAX_IDLE = 30;
     private static final int DEFAULT_MIN_IDLE = 10;
     private static final Boolean DEFAULT_TEST_ON_BORROW = Boolean.FALSE;
-    
+
+    private static final String PROPERTIES_KEY_PRIFIX = "${";
+    private static final String PROPERTIES_KEY_SUFFIX = "}";
+
     // REDIS连接池，可以对应的是操作类型
-    private Map<String, ShardedJedisPool> jedisPool = Maps.newHashMap();
+    public Map<String, ShardedJedisPool> jedisPool = Maps.newHashMap();
 
     private Map<String, JedisCluster> jedisClusterPool = Maps.newHashMap();
 
     private Map<String, RedisConfig> redisConfigs = Maps.newLinkedHashMap();
-    
+
+    private String[] redisRoots;
+
+    @Autowired
+    public void setRedisRoots(
+            @Value(PROPERTIES_KEY_PRIFIX + RedisConfig.ROOT + PROPERTIES_KEY_SUFFIX) String redisNames) {
+        if (me.lucas.kits.commons.utils.StringUtils.isNotBlank(redisNames)) {
+            this.redisRoots = redisNames.split(",");
+        }
+    }
+
+    @Override
+    public void setEmbeddedValueResolver(StringValueResolver resolver) {
+        STRING_VALUE_RESOLVER = resolver;
+    }
+
+    @PostConstruct
+    public void initMethod() {
+        try {
+            final long time = System.currentTimeMillis();
+            //            final RedisClientPool pool = RedisClientPool.getInstance();
+            initRedisConfig();
+            createJedis();
+//            bindGlobal();
+            log.info("加载Redis配置, 耗时: " + (System.currentTimeMillis() - time) + "ms");
+        } catch (final Throwable e) {
+            if (!(e instanceof ClassNotFoundException)) {
+            }
+            log.error(e.getMessage(), e);
+        }
+    }
+
     public RedisClientPool initRedisConfig(final List<Properties> redis) throws LoaderException, IOException {
         if (redis == null || redis.isEmpty()) {
             return this;
@@ -117,20 +168,52 @@ public class RedisClientPool {
         return this;
     }
 
+    public RedisClientPool initRedisConfig() throws LoaderException, IOException {
+        if (redisRoots != null && redisRoots.length != 0) {
+            final Map<String, RedisConfig> confs = Maps.newHashMap();
+            for (String redisRoot : redisRoots) {
+                final RedisConfig conf = RedisConfig.newInstance();
+                for (String filedName : conf.attributeNames()) {
+                    if (RedisConfig.REDIS_TYPE.equals(filedName)) {
+                        String value = STRING_VALUE_RESOLVER.resolveStringValue(
+                                new StringBuilder(PROPERTIES_KEY_PRIFIX).append(RedisConfig.REDIS).append(redisRoot)
+                                        .append(RedisConfig.SEPARATOR).append(RedisConfig.REDIS_TYPE)
+                                        .append(PROPERTIES_KEY_SUFFIX).toString());
+                        Assert.hasLength(value);
+                    } else if (RedisConfig.EXTEND_PROPERTIES.equals(filedName)) {
+                        continue;
+                    }
+                    try {
+
+                        String value = STRING_VALUE_RESOLVER.resolveStringValue(
+                                new StringBuilder(PROPERTIES_KEY_PRIFIX).append(RedisConfig.REDIS).append(redisRoot)
+                                        .append(RedisConfig.SEPARATOR).append(filedName).append(PROPERTIES_KEY_SUFFIX)
+                                        .toString());
+                        conf.setAttributeValue(filedName, value);
+                    } catch (Exception e) {
+                    }
+                }
+                confs.put(conf.getRedisType(), conf);
+            }
+            redisConfigs.putAll(confs);
+        }
+        return this;
+    }
+
     // 初始化连接池
     public void createJedis() {
         redisConfigs.values().stream().filter(conf -> conf.getCluster() == null || !conf.getCluster())
-        .forEach(conf -> jedisPool.put(conf.getRedisType(), createJedisPool(conf)));
+                .forEach(conf -> jedisPool.put(conf.getRedisType(), createJedisPool(conf)));
 
         redisConfigs.values().stream().filter(conf -> conf.getCluster() != null && conf.getCluster())
-        .forEach(conf -> jedisClusterPool.put(conf.getRedisType(), createJedisClusterPool(conf)));
+                .forEach(conf -> jedisClusterPool.put(conf.getRedisType(), createJedisClusterPool(conf)));
     }
-    
+
     public ShardedJedisPool appendJedis(final RedisConfig conf) {
         Assert.notNull(conf);
         Assert.hasLength(conf.getRedisType());
 
-        if(conf.getCluster() == null || !conf.getCluster()) {
+        if (conf.getCluster() == null || !conf.getCluster()) {
             if (!jedisPool.containsKey(conf.getRedisType())) {
                 redisConfigs.put(conf.getRedisType(), conf);
                 final ShardedJedisPool pool;
@@ -138,19 +221,19 @@ public class RedisClientPool {
                 bindGlobal(conf);
                 return pool;
             }
-            
+
             return jedisPool.get(conf.getRedisType());
         }
 
         throw new RedisClientException("Can't append ShardedJedis, this is a redis cluster config");
     }
-    
+
     public JedisCluster appendJedisCluster(RedisConfig conf) {
         Assert.notNull(conf);
         Assert.hasLength(conf.getRedisType());
-        
-        if(conf.getCluster() != null && conf.getCluster()) {
-            if(!jedisClusterPool.containsKey(conf.getRedisType())) {
+
+        if (conf.getCluster() != null && conf.getCluster()) {
+            if (!jedisClusterPool.containsKey(conf.getRedisType())) {
                 redisConfigs.put(conf.getRedisType(), conf);
                 final JedisCluster cluster;
                 jedisClusterPool.put(conf.getRedisType(), cluster = createJedisClusterPool(conf));
@@ -158,7 +241,7 @@ public class RedisClientPool {
                 return cluster;
             }
         }
-        
+
         throw new RedisClientException("Can't append JedisCluster, this is a redis sharded config");
     }
 
@@ -169,42 +252,44 @@ public class RedisClientPool {
 
         LOGGER.info("RedisClient Pools: " + GlobalRedisClient.keys());
     }
-    
+
     public void bindGlobal(final RedisConfig conf) {
         final RedisClient redisClient;
         final String extend = conf.getExtend();
-        if(conf.getCluster() == null || !conf.getCluster()) {
+        if (conf.getCluster() == null || !conf.getCluster()) {
             if (StringUtils.isNotBlank(extend)) {
                 try {
                     final Class<?> cls = Class.forName(extend);
-                    if(RedisClientImpl.class.isAssignableFrom(cls)) {
+                    if (RedisClientImpl.class.isAssignableFrom(cls)) {
                         redisClient = ReflectUtils.newInstance(extend, conf.getRedisType());
                     } else {
-                        throw new RedisClientException("The extend class must inherit <" + RedisClientImpl.class.getName() + '>');
+                        throw new RedisClientException(
+                                "The extend class must inherit <" + RedisClientImpl.class.getName() + '>');
                     }
-                } catch(final ClassNotFoundException e) {
+                } catch (final ClassNotFoundException e) {
                     throw new RedisClientException(e);
                 }
             } else {
                 redisClient = new RedisClientImpl(conf.getRedisType());
             }
         } else {
-            if(StringUtils.isNotBlank(extend)) {
+            if (StringUtils.isNotBlank(extend)) {
                 try {
                     final Class<?> cls = Class.forName(extend);
-                    if(RedisClusterClientImpl.class.isAssignableFrom(cls)) {
+                    if (RedisClusterClientImpl.class.isAssignableFrom(cls)) {
                         redisClient = ReflectUtils.newInstance(extend, conf.getRedisType());
                     } else {
-                        throw new RedisClientException("The extend class must inherit <" + RedisClusterClientImpl.class.getName() + '>');
+                        throw new RedisClientException(
+                                "The extend class must inherit <" + RedisClusterClientImpl.class.getName() + '>');
                     }
-                } catch(final ClassNotFoundException e) {
+                } catch (final ClassNotFoundException e) {
                     throw new RedisClientException(e);
                 }
             } else {
                 redisClient = new RedisClusterClientImpl(conf.getRedisType());
             }
         }
-        
+
         GlobalRedisClient.set(conf.getRedisType(), redisClient);
     }
 
@@ -225,7 +310,7 @@ public class RedisClientPool {
             throw new RedisClientException(e.getMessage(), e);
         }
     }
-    
+
     public JedisCluster getJedisCluster(final String poolName) {
         Assert.hasText(poolName);
         final JedisCluster cluster = jedisClusterPool.get(poolName);
@@ -254,12 +339,13 @@ public class RedisClientPool {
                 if (timeout == null || timeout < 0) {
                     timeout = DEFAULT_TIMEOUT;
                 }
-                
+
                 JedisShardInfo si = new JedisShardInfo(host, port.intValue(), timeout);
                 shards.add(si);
             }
 
-            return new ShardedJedisPool(getJedisPoolConfig(conf), shards, Hashing.MURMUR_HASH, Sharded.DEFAULT_KEY_TAG_PATTERN);
+            return new ShardedJedisPool(getJedisPoolConfig(conf), shards, Hashing.MURMUR_HASH,
+                    Sharded.DEFAULT_KEY_TAG_PATTERN);
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         }
@@ -305,25 +391,25 @@ public class RedisClientPool {
         Assert.notNull(conf);
 
         Integer maxTotal = conf.getMaxTotal();
-        if(maxTotal == null) {
+        if (maxTotal == null) {
             maxTotal = DEFAULT_MAX_TOTAL;
         }
-        
+
         Integer maxIdle = conf.getMaxIdle();
-        if(maxIdle == null) {
+        if (maxIdle == null) {
             maxIdle = DEFAULT_MAX_IDLE;
         }
-        
+
         Integer minIdle = conf.getMinIdle();
-        if(minIdle == null) {
+        if (minIdle == null) {
             minIdle = DEFAULT_MIN_IDLE;
         }
-        
+
         Boolean testOnBorrow = conf.getTestOnBorrow();
-        if(testOnBorrow == null) {
+        if (testOnBorrow == null) {
             testOnBorrow = DEFAULT_TEST_ON_BORROW;
         }
-        
+
         final JedisPoolConfig poolConf = new JedisPoolConfig();
         poolConf.setMaxTotal(maxTotal);
         poolConf.setMaxIdle(maxIdle);

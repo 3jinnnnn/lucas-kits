@@ -15,8 +15,6 @@
  */
 package me.lucas.kits.orm.redis.jedis;
 
-import static me.lucas.kits.orm.redis.jedis.RedisClientPool.POOL;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -35,6 +33,7 @@ import me.lucas.kits.commons.utils.Assert;
 import me.lucas.kits.commons.utils.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
@@ -43,6 +42,8 @@ import redis.clients.jedis.ScanResult;
  * @since 1.3.12
  */
 public abstract class AbstractRedisClient implements RedisClient {
+    //    private static final RedisClientPool pool = RedisClientPool.getInstance();
+
     /** 默认分隔符 */
     public static final String DEFAULT_SEPARATOR = ",";
 
@@ -70,15 +71,19 @@ public abstract class AbstractRedisClient implements RedisClient {
 
     protected RedisConfig config;
 
+    @Autowired
+    private RedisClientPool pool;
+
+    public AbstractRedisClient() {
+    }
+
     public AbstractRedisClient(final String type) {
-        config = POOL.getRedisConfig(type);
+        config = pool.getRedisConfig(type);
     }
 
     public AbstractRedisClient(final RedisConfig config) {
         this.config = config;
     }
-
-
 
     /**
      * FastJson Object to JsonString
@@ -198,6 +203,7 @@ public abstract class AbstractRedisClient implements RedisClient {
         return append(key, toJSONString(value), separator);
     }
 
+    @Override
     public long append(final String key, final Object value) {
         return append(key, toJSONString(value), DEFAULT_SEPARATOR);
     }

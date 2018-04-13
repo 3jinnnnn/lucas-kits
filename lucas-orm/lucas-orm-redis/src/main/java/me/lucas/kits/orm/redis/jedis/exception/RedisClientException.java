@@ -17,7 +17,7 @@ package me.lucas.kits.orm.redis.jedis.exception;
 
 /**
  * Jedis操作异常处理类.
- * 
+ *
  * @author yanghe
  * @since 1.0
  */

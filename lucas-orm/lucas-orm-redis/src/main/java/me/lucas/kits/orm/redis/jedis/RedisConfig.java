@@ -23,10 +23,14 @@ import me.lucas.kits.orm.redis.jedis.exception.NotFoundExtendException;
 
 /**
  * RedisClient的连接配置.
+ *
  * @author yanghe
  * @since 1.0
  */
 public class RedisConfig extends BaseEntity {
+    private static final long serialVersionUID = 4457350932293696381L;
+
+    public static final String SEPARATOR = ".";
     public static final String REDIS = "redis.";
     public static final String ROOT = "redis.root";
     public static final String REDIS_TYPE = "redisType";
@@ -45,8 +49,6 @@ public class RedisConfig extends BaseEntity {
     public static final String LOCK_TIMEOUT = "lockTimeout";
     public static final String LOCK_HASH = "lockGroup";
 
-    private static final long serialVersionUID = -6765559689700998419L;
-
     private String redisType;
     private String hostNames;
     private Integer maxTotal;
@@ -58,42 +60,43 @@ public class RedisConfig extends BaseEntity {
 
     /**
      * RedisClient扩展.
+     *
      * @since 1.3.10
      */
     private String extend;
 
     /**
      * RedisClient扩展属性路径.
+     *
      * @since 1.3.10
      */
     private String extendResource;
 
     /**
      * RedisClient扩展属性.
+     *
      * @since 1.3.10
      */
     private Properties extendProperties;
 
     /**
      * JedisCluster模式.
+     *
      * @since 1.3.12
      */
     private Boolean cluster;
 
     /**
-     * 
      * @since 1.3.12
      */
     private Integer maxRedirections;
 
     /**
-     * 
      * @since 1.4.9
      */
     private Integer lockTimeout;
 
     /**
-     * 
      * @since 1.4.9
      */
     private String lockGroup;

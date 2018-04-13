@@ -15,8 +15,6 @@
  */
 package me.lucas.kits.orm.redis.jedis.cluster;
 
-import static me.lucas.kits.orm.redis.jedis.RedisClientPool.POOL;
-
 import com.alibaba.fastjson.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -31,6 +29,7 @@ import me.lucas.kits.commons.utils.Assert;
 import me.lucas.kits.commons.utils.CollectionUtils;
 import me.lucas.kits.orm.redis.jedis.AbstractRedisClient;
 import me.lucas.kits.orm.redis.jedis.RedisClient;
+import me.lucas.kits.orm.redis.jedis.RedisClientPool;
 import me.lucas.kits.orm.redis.jedis.RedisConfig;
 import me.lucas.kits.orm.redis.jedis.exception.RedisClientException;
 import org.apache.commons.lang3.ArrayUtils;
@@ -43,11 +42,11 @@ import redis.clients.jedis.Tuple;
 import redis.clients.jedis.exceptions.JedisClusterException;
 
 /**
- *
  * @author yanghe
  * @since 1.3.12
  */
 public class RedisClusterClientImpl extends AbstractRedisClient implements RedisClient {
+    private static final RedisClientPool POOL = RedisClientPool.getInstance();
     protected JedisCluster cluster;
 
     public RedisClusterClientImpl(final String type) {
@@ -539,14 +538,14 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
         try {
             final List<String> values;
             switch (pop) {
-                case LPOP:
-                    values = cluster.blpop(timeout, key);
-                    break;
-                case RPOP:
-                    values = cluster.brpop(timeout, key);
-                    break;
-                default:
-                    throw new RedisClientException("Unknown Pop type");
+            case LPOP:
+                values = cluster.blpop(timeout, key);
+                break;
+            case RPOP:
+                values = cluster.brpop(timeout, key);
+                break;
+            default:
+                throw new RedisClientException("Unknown Pop type");
             }
 
             if (!CollectionUtils.isEmpty(values)) {
@@ -561,7 +560,8 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
 
     @Override
     public Map<String, String> bpop(final String[] keys, final Mark pop) {
-        throw new UnsupportedAccessException("Redis Cluster does not support 'blpop' or 'brpop' calls without timeout parameters");
+        throw new UnsupportedAccessException(
+                "Redis Cluster does not support 'blpop' or 'brpop' calls without timeout parameters");
     }
 
     @Override
@@ -571,14 +571,14 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
         try {
             final List<String> values;
             switch (pop) {
-                case LPOP:
-                    values = cluster.blpop(timeout, keys);
-                    break;
-                case RPOP:
-                    values = cluster.brpop(timeout, keys);
-                    break;
-                default:
-                    throw new RedisClientException("Unknown Pop type");
+            case LPOP:
+                values = cluster.blpop(timeout, keys);
+                break;
+            case RPOP:
+                values = cluster.brpop(timeout, keys);
+                break;
+            default:
+                throw new RedisClientException("Unknown Pop type");
             }
 
             if (!CollectionUtils.isEmpty(values)) {
@@ -629,12 +629,12 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
         Assert.notNull(position);
         try {
             switch (position) {
-                case BEFORE:
-                    return cluster.linsert(key, LIST_POSITION.BEFORE, pivot, value);
-                case AFTER:
-                    return cluster.linsert(key, LIST_POSITION.AFTER, pivot, value);
-                default:
-                    throw new RedisClientException("Unknown pivot type");
+            case BEFORE:
+                return cluster.linsert(key, LIST_POSITION.BEFORE, pivot, value);
+            case AFTER:
+                return cluster.linsert(key, LIST_POSITION.AFTER, pivot, value);
+            default:
+                throw new RedisClientException("Unknown pivot type");
             }
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
@@ -657,12 +657,12 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
         Assert.notNull(pop);
         try {
             switch (pop) {
-                case LPOP:
-                    return cluster.lpop(key);
-                case RPOP:
-                    return cluster.rpop(key);
-                default:
-                    throw new RedisClientException("Unknown pop type");
+            case LPOP:
+                return cluster.lpop(key);
+            case RPOP:
+                return cluster.rpop(key);
+            default:
+                throw new RedisClientException("Unknown pop type");
             }
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
@@ -674,9 +674,9 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
         Assert.hasText(key);
 
         final Mark pop;
-        if (count >= 0)
+        if (count >= 0) {
             pop = Mark.LPOP;
-        else {
+        } else {
             pop = Mark.RPOP;
             count = count * -1;
         }
@@ -689,20 +689,20 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
 
             final List<String> values = Lists.newArrayList();
             switch (pop) {
-                case LPOP:
-                    for (int idx = 0; idx <= count; idx++) {
-                        values.add(cluster.lpop(key));
-                    }
+            case LPOP:
+                for (int idx = 0; idx <= count; idx++) {
+                    values.add(cluster.lpop(key));
+                }
 
-                    break;
-                case RPOP:
-                    for (int idx = 0; idx <= count; idx++) {
-                        values.add(cluster.rpop(key));
-                    }
+                break;
+            case RPOP:
+                for (int idx = 0; idx <= count; idx++) {
+                    values.add(cluster.rpop(key));
+                }
 
-                    break;
-                default:
-                    throw new RedisClientException("Unknown pop type");
+                break;
+            default:
+                throw new RedisClientException("Unknown pop type");
             }
 
             return values;
@@ -718,14 +718,14 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
         Assert.notNull(push);
         try {
             switch (push) {
-                case LPUSH:
-                    cluster.lpush(key, values);
-                    break;
-                case RPUSH:
-                    cluster.rpush(key, values);
-                    break;
-                default:
-                    throw new RedisClientException("Unknown pop type");
+            case LPUSH:
+                cluster.lpush(key, values);
+                break;
+            case RPUSH:
+                cluster.rpush(key, values);
+                break;
+            default:
+                throw new RedisClientException("Unknown pop type");
             }
 
             return true;
@@ -735,7 +735,8 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     }
 
     @Override
-    public boolean push(final String key, final String scanKey, final String value, final Mark push, final Mark policy) {
+    public boolean push(final String key, final String scanKey, final String value, final Mark push,
+            final Mark policy) {
         Assert.hasText(key);
         Assert.hasText(scanKey);
         Assert.hasText(value);
@@ -744,34 +745,34 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
 
         try {
             switch (push) {
-                case LPUSH:
-                    switch (policy) {
-                        case KEY:
-                            cluster.lpush(key, scanKey);
-                            break;
-                        case VALUE:
-                            cluster.lpush(key, value);
-                            break;
-                        default:
-                            throw new RedisClientException("未知的策略(policy)类型");
-                    }
-
+            case LPUSH:
+                switch (policy) {
+                case KEY:
+                    cluster.lpush(key, scanKey);
                     break;
-                case RPUSH:
-                    switch (policy) {
-                        case KEY:
-                            cluster.rpush(key, scanKey);
-                            break;
-                        case VALUE:
-                            cluster.rpush(key, value);
-                            break;
-                        default:
-                            throw new RedisClientException("未知的策略(policy)类型");
-                    }
-
+                case VALUE:
+                    cluster.lpush(key, value);
                     break;
                 default:
-                    throw new RedisClientException("未知的写入(PUSH)类型");
+                    throw new RedisClientException("未知的策略(policy)类型");
+                }
+
+                break;
+            case RPUSH:
+                switch (policy) {
+                case KEY:
+                    cluster.rpush(key, scanKey);
+                    break;
+                case VALUE:
+                    cluster.rpush(key, value);
+                    break;
+                default:
+                    throw new RedisClientException("未知的策略(policy)类型");
+                }
+
+                break;
+            default:
+                throw new RedisClientException("未知的写入(PUSH)类型");
             }
 
             return isOK(cluster.set(scanKey, value));
@@ -781,7 +782,8 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     }
 
     @Override
-    public Map<String, Boolean> push(final String key, final Map<String, Object> scanMap, final Mark push, final Mark policy) {
+    public Map<String, Boolean> push(final String key, final Map<String, Object> scanMap, final Mark push,
+            final Mark policy) {
         Assert.hasText(key);
         Assert.notEmpty(scanMap);
         Assert.notNull(push);
@@ -793,34 +795,34 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
                 final String field = entry.getKey();
                 final String value = toJSONString(entry.getValue());
                 switch (push) {
-                    case LPUSH:
-                        switch (policy) {
-                            case KEY:
-                                cluster.lpush(key, field);
-                                break;
-                            case VALUE:
-                                cluster.lpush(key, value);
-                                break;
-                            default:
-                                throw new RedisClientException("未知的策略(policy)类型");
-                        }
-
+                case LPUSH:
+                    switch (policy) {
+                    case KEY:
+                        cluster.lpush(key, field);
                         break;
-                    case RPUSH:
-                        switch (policy) {
-                            case KEY:
-                                cluster.rpush(key, field);
-                                break;
-                            case VALUE:
-                                cluster.rpush(key, value);
-                                break;
-                            default:
-                                throw new RedisClientException("未知的策略(policy)类型");
-                        }
-
+                    case VALUE:
+                        cluster.lpush(key, value);
                         break;
                     default:
-                        throw new RedisClientException("未知的写入(PUSH)类型");
+                        throw new RedisClientException("未知的策略(policy)类型");
+                    }
+
+                    break;
+                case RPUSH:
+                    switch (policy) {
+                    case KEY:
+                        cluster.rpush(key, field);
+                        break;
+                    case VALUE:
+                        cluster.rpush(key, value);
+                        break;
+                    default:
+                        throw new RedisClientException("未知的策略(policy)类型");
+                    }
+
+                    break;
+                default:
+                    throw new RedisClientException("未知的写入(PUSH)类型");
                 }
 
                 response.put(field, isOK(cluster.set(field, value)));
@@ -841,26 +843,26 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
         try {
             long pushed = 0;
             switch (push) {
-                case LPUSH:
-                    for (String value : values) {
-                        if (pushed == 0) {
-                            pushed += cluster.lpushx(key, value);
-                        } else if (cluster.lpushx(key, value) > 0) {
-                            pushed++;
-                        }
+            case LPUSH:
+                for (String value : values) {
+                    if (pushed == 0) {
+                        pushed += cluster.lpushx(key, value);
+                    } else if (cluster.lpushx(key, value) > 0) {
+                        pushed++;
                     }
-                    break;
-                case RPUSH:
-                    for (String value : values) {
-                        if (pushed == 0) {
-                            pushed += cluster.rpushx(key, value);
-                        } else if (cluster.rpushx(key, value) > 0) {
-                            pushed++;
-                        }
+                }
+                break;
+            case RPUSH:
+                for (String value : values) {
+                    if (pushed == 0) {
+                        pushed += cluster.rpushx(key, value);
+                    } else if (cluster.rpushx(key, value) > 0) {
+                        pushed++;
                     }
-                    break;
-                default:
-                    throw new RedisClientException("未知的写入(PUSH)类型");
+                }
+                break;
+            default:
+                throw new RedisClientException("未知的写入(PUSH)类型");
             }
 
             return pushed;
@@ -1200,7 +1202,8 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     }
 
     @Override
-    public Set<String> zrangeByLex(final String key, final String min, final String max, final int offset, final int count) {
+    public Set<String> zrangeByLex(final String key, final String min, final String max, final int offset,
+            final int count) {
         Assert.hasText(key);
         Assert.hasText(min);
         Assert.hasText(max);
@@ -1212,7 +1215,8 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     }
 
     @Override
-    public <T> Map<T, Double> zrangeWithScores(final String key, final long start, final long end, final TypeReference<T> type) {
+    public <T> Map<T, Double> zrangeWithScores(final String key, final long start, final long end,
+            final TypeReference<T> type) {
         Assert.hasText(key);
         Assert.notNull(type);
         try {
@@ -1245,7 +1249,8 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     }
 
     @Override
-    public Set<String> zrangeByScore(final String key, final String min, final String max, final int offset, final int count) {
+    public Set<String> zrangeByScore(final String key, final String min, final String max, final int offset,
+            final int count) {
         Assert.hasText(key);
         Assert.hasText(min);
         Assert.hasText(max);
@@ -1257,7 +1262,8 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     }
 
     @Override
-    public <T> Map<T, Double> zrangeByScoreWithScores(final String key, final String min, final String max, final TypeReference<T> type) {
+    public <T> Map<T, Double> zrangeByScoreWithScores(final String key, final String min, final String max,
+            final TypeReference<T> type) {
         Assert.hasText(key);
         Assert.hasText(min);
         Assert.hasText(max);
@@ -1280,8 +1286,8 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     }
 
     @Override
-    public <T> Map<T, Double> zrangeByScoreWithScores(final String key, final String min, final String max, final int offset, final int count,
-            final TypeReference<T> type) {
+    public <T> Map<T, Double> zrangeByScoreWithScores(final String key, final String min, final String max,
+            final int offset, final int count, final TypeReference<T> type) {
         Assert.hasLength(key);
         Assert.hasText(min);
         Assert.hasText(max);
@@ -1385,7 +1391,8 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     }
 
     @Override
-    public Set<String> zrevrangeByLex(final String key, final String max, final String min, final int offset, final int count) {
+    public Set<String> zrevrangeByLex(final String key, final String max, final String min, final int offset,
+            final int count) {
         Assert.hasText(key);
         Assert.hasText(max);
         Assert.hasText(min);
@@ -1397,7 +1404,8 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     }
 
     @Override
-    public <T> Map<T, Double> zrevrangeWithScores(final String key, final long start, final long end, final TypeReference<T> type) {
+    public <T> Map<T, Double> zrevrangeWithScores(final String key, final long start, final long end,
+            final TypeReference<T> type) {
         Assert.hasText(key);
         Assert.notNull(type);
         try {
@@ -1428,7 +1436,8 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     }
 
     @Override
-    public Set<String> zrevrangeByScore(final String key, final double max, final double min, final int offset, final int count) {
+    public Set<String> zrevrangeByScore(final String key, final double max, final double min, final int offset,
+            final int count) {
         Assert.hasText(key);
         try {
             return cluster.zrevrangeByScore(key, max, min, offset, count);
@@ -1438,7 +1447,8 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     }
 
     @Override
-    public <T> Map<T, Double> zrevrangeByScoreWithScores(final String key, final double max, final double min, final TypeReference<T> type) {
+    public <T> Map<T, Double> zrevrangeByScoreWithScores(final String key, final double max, final double min,
+            final TypeReference<T> type) {
         Assert.hasText(key);
         Assert.notNull(type);
         try {
@@ -1459,8 +1469,8 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     }
 
     @Override
-    public <T> Map<T, Double> zrevrangeByScoreWithScores(final String key, final double max, final double min, final int offset, final int count,
-            final TypeReference<T> type) {
+    public <T> Map<T, Double> zrevrangeByScoreWithScores(final String key, final double max, final double min,
+            final int offset, final int count, final TypeReference<T> type) {
         Assert.hasText(key);
         Assert.notNull(type);
         try {

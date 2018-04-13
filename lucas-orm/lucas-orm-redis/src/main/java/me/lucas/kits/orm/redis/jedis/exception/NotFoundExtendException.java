@@ -16,7 +16,6 @@
 package me.lucas.kits.orm.redis.jedis.exception;
 
 /**
- *
  * @author yanghe
  * @since 1.3.10
  */
@@ -27,17 +26,17 @@ public class NotFoundExtendException extends RedisClientException {
     public NotFoundExtendException() {
 
     }
-    
+
     public NotFoundExtendException(final String message) {
         super(message);
     }
-    
+
     public NotFoundExtendException(final String message, final Throwable cause) {
         super(message, cause);
     }
-    
+
     public NotFoundExtendException(final Throwable cause) {
         super(cause);
     }
-    
+
 }
