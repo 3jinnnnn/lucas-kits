@@ -28,19 +28,20 @@ import redis.clients.jedis.ShardedJedisPool;
 @WebAppConfiguration
 public class RedisClientTest {
 
-    @Autowired
-    @Qualifier("shiro")
-    private ShardedJedisPool shiro;
+    //    @Autowired
+    //    @Qualifier("shiro")
+    //    private ShardedJedisPool shiro;
 
     @Autowired
-    @Qualifier("shiro")
+    @Qualifier(RedisClientPool.REDIS_PRIFIX + "shiro")
     private RedisClient redis;
 
     @Test
     public void test() {
         Properties properties = PropertiesLoader.load("redis.properties");
         log.info(JSON.toJSONString(properties));
-        String info = shiro.getResource().get("123");
-        log.info(JSON.toJSONString(info));
+        log.info(redis.get("123"));
+        //        String info = shiro.getResource().get("123");
+        //        log.info(JSON.toJSONString(info));
     }
 }

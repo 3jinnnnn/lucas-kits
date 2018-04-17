@@ -29,20 +29,28 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import me.lucas.kits.commons.utils.Assert;
 import me.lucas.kits.commons.utils.CollectionUtils;
+import me.lucas.kits.orm.redis.jedis.exception.RedisClientException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
+import redis.clients.jedis.ShardedJedis;
+import redis.clients.jedis.ShardedJedisPool;
 
 /**
  * @author yanghe
  * @since 1.3.12
  */
+@Slf4j
+@NoArgsConstructor
 public abstract class AbstractRedisClient implements RedisClient {
-    //    private static final RedisClientPool pool = RedisClientPool.getInstance();
 
     /** 默认分隔符 */
     public static final String DEFAULT_SEPARATOR = ",";
@@ -69,19 +77,52 @@ public abstract class AbstractRedisClient implements RedisClient {
      */
     public static final ScanParams DEFAULT_SCAN_PARAMS = new ScanParams();
 
+    @Getter
+    @Setter
+    @NonNull
     protected RedisConfig config;
+    @Getter
+    @Setter
+    @NonNull
+    protected ShardedJedisPool pool;
 
-    protected RedisClientPool pool;
+    //    public AbstractRedisClient() {
+    //    }
+    //
+    //    public AbstractRedisClient(final String type) {
+    //        config = pool.getRedisConfig(type);
+    //    }
 
-    public AbstractRedisClient() {
+    //    public AbstractRedisClient(final RedisConfig config) {
+    //        this.config = config;
+    //    }
+
+    /**
+     * 根据连接池名，取得连接
+     *
+     * @return ShardedJedis
+     */
+    public ShardedJedis getJedis() {
+        ShardedJedis shardedJedis = null;
+        try {
+            if (pool != null) {
+                boolean closed = pool.isClosed();
+                log.info(String.valueOf(closed));
+                shardedJedis = pool.getResource();
+            }
+            Assert.notNull(shardedJedis, "Not found ShardedJedis.");
+            return shardedJedis;
+        } catch (final Throwable e) {
+            close();
+            throw new RedisClientException(e.getMessage(), e);
+        }
     }
 
-    public AbstractRedisClient(final String type) {
-        config = pool.getRedisConfig(type);
-    }
-
-    public AbstractRedisClient(final RedisConfig config) {
-        this.config = config;
+    public void close() {
+        if (pool == null) {
+            return;
+        }
+        pool.close();
     }
 
     /**

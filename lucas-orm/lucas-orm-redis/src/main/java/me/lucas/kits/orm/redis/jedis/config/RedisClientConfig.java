@@ -46,7 +46,6 @@ public class RedisClientConfig implements ApplicationContextAware {
             final long time = System.currentTimeMillis();
             pool.initRedisConfig();
             pool.createJedis();
-            pool.bindGlobal();
             log.info("加载Redis配置, 耗时: " + (System.currentTimeMillis() - time) + "ms");
         } catch (final Throwable e) {
             if (!(e instanceof ClassNotFoundException)) {

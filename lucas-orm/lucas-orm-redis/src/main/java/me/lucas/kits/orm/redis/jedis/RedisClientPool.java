@@ -64,6 +64,8 @@ import redis.clients.util.Sharded;
 @Component
 public class RedisClientPool implements ApplicationContextAware {
     public static final String MAIN_REDIS = "/redis.properties";
+    public static final String POOL_PRIFIX = "pool:";
+    public static final String REDIS_PRIFIX = "redis:";
 
     private static final int DEFAULT_TIMEOUT = 2000;
     private static final int DEFAULT_MAX_REDIRECTIONS = 5;
@@ -164,7 +166,6 @@ public class RedisClientPool implements ApplicationContextAware {
                 redisConfigs.put(conf.getRedisType(), conf);
                 final ShardedJedisPool pool;
                 jedisPool.put(conf.getRedisType(), pool = createJedisPool(conf));
-                bindGlobal(conf);
                 return pool;
             }
 
@@ -183,7 +184,6 @@ public class RedisClientPool implements ApplicationContextAware {
                 redisConfigs.put(conf.getRedisType(), conf);
                 final JedisCluster cluster;
                 jedisClusterPool.put(conf.getRedisType(), cluster = createJedisClusterPool(conf));
-                bindGlobal(conf);
                 return cluster;
             }
         }
@@ -191,56 +191,9 @@ public class RedisClientPool implements ApplicationContextAware {
         throw new RedisClientException("Can't append JedisCluster, this is a redis sharded config");
     }
 
-    public void bindGlobal() {
-        for (Entry<String, RedisConfig> entry : redisConfigs.entrySet()) {
-            bindGlobal(entry.getValue());
-        }
-
-        log.info("RedisClient Pools: " + GlobalRedisClient.keys());
-    }
-
-    public void bindGlobal(final RedisConfig conf) {
-        final RedisClient redisClient;
-        final String extend = conf.getExtend();
-        if (conf.getCluster() == null || !conf.getCluster()) {
-            if (StringUtils.isNotBlank(extend)) {
-                try {
-                    final Class<?> cls = Class.forName(extend);
-                    if (RedisClientImpl.class.isAssignableFrom(cls)) {
-                        redisClient = ReflectUtils.newInstance(extend, conf.getRedisType());
-                    } else {
-                        throw new RedisClientException(
-                                "The extend class must inherit <" + RedisClientImpl.class.getName() + '>');
-                    }
-                } catch (final ClassNotFoundException e) {
-                    throw new RedisClientException(e);
-                }
-            } else {
-                redisClient = new RedisClientImpl(conf.getRedisType());
-            }
-        } else {
-            if (StringUtils.isNotBlank(extend)) {
-                try {
-                    final Class<?> cls = Class.forName(extend);
-                    if (RedisClusterClientImpl.class.isAssignableFrom(cls)) {
-                        redisClient = ReflectUtils.newInstance(extend, conf.getRedisType());
-                    } else {
-                        throw new RedisClientException(
-                                "The extend class must inherit <" + RedisClusterClientImpl.class.getName() + '>');
-                    }
-                } catch (final ClassNotFoundException e) {
-                    throw new RedisClientException(e);
-                }
-            } else {
-                redisClient = new RedisClusterClientImpl(conf.getRedisType());
-            }
-        }
-
-        GlobalRedisClient.set(conf.getRedisType(), redisClient);
-    }
-
     /**
      * 根据连接池名，取得连接
+     *
      * @param poolName poolName
      * @return ShardedJedis
      */
@@ -315,18 +268,19 @@ public class RedisClientPool implements ApplicationContextAware {
             poolBeanDefinitionBuilder.addConstructorArgValue(Hashing.MURMUR_HASH);
             poolBeanDefinitionBuilder.addConstructorArgValue(Sharded.DEFAULT_KEY_TAG_PATTERN);
             BeanDefinition poolBeanDefinition = poolBeanDefinitionBuilder.getBeanDefinition();
-            BEAN_FACTORY.registerBeanDefinition(conf.getRedisType(), poolBeanDefinition);
+            BEAN_FACTORY.registerBeanDefinition(POOL_PRIFIX + conf.getRedisType(), poolBeanDefinition);
 
             // 注册RedisClientImpl
             BeanDefinitionBuilder clientBeanDefinitionBuilder = BeanDefinitionBuilder
                     .genericBeanDefinition(RedisClientImpl.class);
-            clientBeanDefinitionBuilder.addConstructorArgValue(conf);
             clientBeanDefinitionBuilder.addPropertyValue("config", conf);
-            clientBeanDefinitionBuilder
-                    .addPropertyValue("pool", APPLICATION_CONTEXT.getBean(conf.getRedisType(), RedisClientPool.class));
-            BeanDefinition clientBeanDefinition = poolBeanDefinitionBuilder.getBeanDefinition();
-            BEAN_FACTORY.registerBeanDefinition(conf.getRedisType(), clientBeanDefinition);
-
+            ShardedJedisPool jedisPool = APPLICATION_CONTEXT
+                    .getBean(POOL_PRIFIX + conf.getRedisType(), ShardedJedisPool.class);
+            clientBeanDefinitionBuilder.addPropertyReference("pool", POOL_PRIFIX + conf.getRedisType());
+            BeanDefinition clientBeanDefinition = clientBeanDefinitionBuilder.getBeanDefinition();
+            BEAN_FACTORY.registerBeanDefinition(REDIS_PRIFIX + conf.getRedisType(), clientBeanDefinition);
+            RedisClientImpl redisClient = APPLICATION_CONTEXT
+                    .getBean(REDIS_PRIFIX + conf.getRedisType(), RedisClientImpl.class);
             return new ShardedJedisPool(getJedisPoolConfig(conf), shards, Hashing.MURMUR_HASH,
                     Sharded.DEFAULT_KEY_TAG_PATTERN);
         } catch (final Throwable e) {
@@ -371,6 +325,7 @@ public class RedisClientPool implements ApplicationContextAware {
 
     /**
      * 设置redis连接池的属性
+     *
      * @param conf RedisConfig
      * @return JedisPoolConfig
      */

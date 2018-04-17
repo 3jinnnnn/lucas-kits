@@ -51,15 +51,15 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     private RedisClientPool pool;
     protected JedisCluster cluster;
 
-    public RedisClusterClientImpl(final String type) {
-        super(type);
-        cluster = pool.getJedisCluster(type);
-    }
-
-    public RedisClusterClientImpl(final RedisConfig config) {
-        super(config);
-        cluster = pool.appendJedisCluster(config);
-    }
+//    public RedisClusterClientImpl(final String type) {
+//        super(type);
+//        cluster = pool.getJedisCluster(type);
+//    }
+//
+//    public RedisClusterClientImpl(final RedisConfig config) {
+//        super(config);
+//        cluster = pool.appendJedisCluster(config);
+//    }
 
     @Override
     public List<Map<String, String>> info() {
