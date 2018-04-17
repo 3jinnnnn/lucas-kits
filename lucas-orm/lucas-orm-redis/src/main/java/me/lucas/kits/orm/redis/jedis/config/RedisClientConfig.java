@@ -12,6 +12,7 @@ import me.lucas.kits.orm.redis.jedis.sharded.RedisClientImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -32,16 +33,17 @@ public class RedisClientConfig implements ApplicationContextAware {
     private static final String DEFAULT_REDIS_PATH = "/redis.properties";
     private final List<Properties> properties = Lists.newArrayList();
 
+    @Autowired
+    private RedisClientPool pool;
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         APPLICATION_CONTEXT = applicationContext;
     }
 
-//    @PostConstruct
     public void initMethod() {
         try {
             final long time = System.currentTimeMillis();
-            final RedisClientPool pool = RedisClientPool.getInstance();
             pool.initRedisConfig();
             pool.createJedis();
             pool.bindGlobal();

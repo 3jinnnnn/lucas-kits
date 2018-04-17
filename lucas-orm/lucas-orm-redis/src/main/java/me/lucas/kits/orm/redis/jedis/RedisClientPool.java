@@ -36,13 +36,15 @@ import me.lucas.kits.orm.redis.jedis.cluster.RedisClusterClientImpl;
 import me.lucas.kits.orm.redis.jedis.exception.RedisClientException;
 import me.lucas.kits.orm.redis.jedis.sharded.RedisClientImpl;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.EmbeddedValueResolverAware;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringValueResolver;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPoolConfig;
@@ -60,21 +62,8 @@ import redis.clients.util.Sharded;
  */
 @Slf4j
 @Component
-public class RedisClientPool implements EmbeddedValueResolverAware {
-    private static StringValueResolver STRING_VALUE_RESOLVER;
-
-    private RedisClientPool() {}
-
-    /** RedisClientPool. */
-    private static final RedisClientPool POOL = new RedisClientPool();
-
-    public static RedisClientPool getInstance() {
-        return POOL;
-    }
-
+public class RedisClientPool implements ApplicationContextAware {
     public static final String MAIN_REDIS = "/redis.properties";
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(RedisClientPool.class);
 
     private static final int DEFAULT_TIMEOUT = 2000;
     private static final int DEFAULT_MAX_REDIRECTIONS = 5;
@@ -83,43 +72,30 @@ public class RedisClientPool implements EmbeddedValueResolverAware {
     private static final int DEFAULT_MIN_IDLE = 10;
     private static final Boolean DEFAULT_TEST_ON_BORROW = Boolean.FALSE;
 
-    private static final String PROPERTIES_KEY_PRIFIX = "${";
-    private static final String PROPERTIES_KEY_SUFFIX = "}";
+    private static ApplicationContext APPLICATION_CONTEXT;
+    private static BeanDefinitionRegistry BEAN_FACTORY;
 
-    // REDIS连接池，可以对应的是操作类型
-    public Map<String, ShardedJedisPool> jedisPool = Maps.newHashMap();
+    /** REDIS连接池，可以对应的是操作类型 */
+    private Map<String, ShardedJedisPool> jedisPool = Maps.newHashMap();
 
     private Map<String, JedisCluster> jedisClusterPool = Maps.newHashMap();
 
     private Map<String, RedisConfig> redisConfigs = Maps.newLinkedHashMap();
 
-    private String[] redisRoots;
-
-    @Autowired
-    public void setRedisRoots(
-            @Value(PROPERTIES_KEY_PRIFIX + RedisConfig.ROOT + PROPERTIES_KEY_SUFFIX) String redisNames) {
-        if (me.lucas.kits.commons.utils.StringUtils.isNotBlank(redisNames)) {
-            this.redisRoots = redisNames.split(",");
-        }
-    }
-
     @Override
-    public void setEmbeddedValueResolver(StringValueResolver resolver) {
-        STRING_VALUE_RESOLVER = resolver;
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        APPLICATION_CONTEXT = applicationContext;
     }
 
     @PostConstruct
-    public void initMethod() {
+    public void init() {
+        Properties properties = PropertiesLoader.load(MAIN_REDIS);
         try {
-            final long time = System.currentTimeMillis();
-            //            final RedisClientPool pool = RedisClientPool.getInstance();
-            initRedisConfig();
+            initRedisConfig(properties);
+            BEAN_FACTORY = (DefaultListableBeanFactory) ((ConfigurableApplicationContext) APPLICATION_CONTEXT)
+                    .getBeanFactory();
             createJedis();
-//            bindGlobal();
-            log.info("加载Redis配置, 耗时: " + (System.currentTimeMillis() - time) + "ms");
-        } catch (final Throwable e) {
-            if (!(e instanceof ClassNotFoundException)) {
-            }
+        } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
     }
@@ -168,39 +144,9 @@ public class RedisClientPool implements EmbeddedValueResolverAware {
         return this;
     }
 
-    public RedisClientPool initRedisConfig() throws LoaderException, IOException {
-        if (redisRoots != null && redisRoots.length != 0) {
-            final Map<String, RedisConfig> confs = Maps.newHashMap();
-            for (String redisRoot : redisRoots) {
-                final RedisConfig conf = RedisConfig.newInstance();
-                for (String filedName : conf.attributeNames()) {
-                    if (RedisConfig.REDIS_TYPE.equals(filedName)) {
-                        String value = STRING_VALUE_RESOLVER.resolveStringValue(
-                                new StringBuilder(PROPERTIES_KEY_PRIFIX).append(RedisConfig.REDIS).append(redisRoot)
-                                        .append(RedisConfig.SEPARATOR).append(RedisConfig.REDIS_TYPE)
-                                        .append(PROPERTIES_KEY_SUFFIX).toString());
-                        Assert.hasLength(value);
-                    } else if (RedisConfig.EXTEND_PROPERTIES.equals(filedName)) {
-                        continue;
-                    }
-                    try {
-
-                        String value = STRING_VALUE_RESOLVER.resolveStringValue(
-                                new StringBuilder(PROPERTIES_KEY_PRIFIX).append(RedisConfig.REDIS).append(redisRoot)
-                                        .append(RedisConfig.SEPARATOR).append(filedName).append(PROPERTIES_KEY_SUFFIX)
-                                        .toString());
-                        conf.setAttributeValue(filedName, value);
-                    } catch (Exception e) {
-                    }
-                }
-                confs.put(conf.getRedisType(), conf);
-            }
-            redisConfigs.putAll(confs);
-        }
-        return this;
-    }
-
-    // 初始化连接池
+    /**
+     * 初始化连接池.
+     */
     public void createJedis() {
         redisConfigs.values().stream().filter(conf -> conf.getCluster() == null || !conf.getCluster())
                 .forEach(conf -> jedisPool.put(conf.getRedisType(), createJedisPool(conf)));
@@ -250,7 +196,7 @@ public class RedisClientPool implements EmbeddedValueResolverAware {
             bindGlobal(entry.getValue());
         }
 
-        LOGGER.info("RedisClient Pools: " + GlobalRedisClient.keys());
+        log.info("RedisClient Pools: " + GlobalRedisClient.keys());
     }
 
     public void bindGlobal(final RedisConfig conf) {
@@ -293,7 +239,11 @@ public class RedisClientPool implements EmbeddedValueResolverAware {
         GlobalRedisClient.set(conf.getRedisType(), redisClient);
     }
 
-    // 根据连接池名，取得连接
+    /**
+     * 根据连接池名，取得连接
+     * @param poolName poolName
+     * @return ShardedJedis
+     */
     public ShardedJedis getJedis(final String poolName) {
         Assert.hasText(poolName);
         ShardedJedis shardedJedis = null;
@@ -311,6 +261,14 @@ public class RedisClientPool implements EmbeddedValueResolverAware {
         }
     }
 
+    public Map<String, ShardedJedisPool> getJedisPool() {
+        return this.jedisPool;
+    }
+
+    public Map<String, JedisCluster> getJedisClusterPool() {
+        return this.jedisClusterPool;
+    }
+
     public JedisCluster getJedisCluster(final String poolName) {
         Assert.hasText(poolName);
         final JedisCluster cluster = jedisClusterPool.get(poolName);
@@ -318,7 +276,12 @@ public class RedisClientPool implements EmbeddedValueResolverAware {
         return cluster;
     }
 
-    // 创建连接池
+    /**
+     * 创建连接池.
+     *
+     * @param conf RedisConfig
+     * @return ShardedJedisPool
+     */
     private ShardedJedisPool createJedisPool(final RedisConfig conf) {
         Assert.notNull(conf);
         try {
@@ -343,6 +306,26 @@ public class RedisClientPool implements EmbeddedValueResolverAware {
                 JedisShardInfo si = new JedisShardInfo(host, port.intValue(), timeout);
                 shards.add(si);
             }
+
+            // 注册ShardedJedisPool
+            BeanDefinitionBuilder poolBeanDefinitionBuilder = BeanDefinitionBuilder
+                    .genericBeanDefinition(ShardedJedisPool.class);
+            poolBeanDefinitionBuilder.addConstructorArgValue(getJedisPoolConfig(conf));
+            poolBeanDefinitionBuilder.addConstructorArgValue(shards);
+            poolBeanDefinitionBuilder.addConstructorArgValue(Hashing.MURMUR_HASH);
+            poolBeanDefinitionBuilder.addConstructorArgValue(Sharded.DEFAULT_KEY_TAG_PATTERN);
+            BeanDefinition poolBeanDefinition = poolBeanDefinitionBuilder.getBeanDefinition();
+            BEAN_FACTORY.registerBeanDefinition(conf.getRedisType(), poolBeanDefinition);
+
+            // 注册RedisClientImpl
+            BeanDefinitionBuilder clientBeanDefinitionBuilder = BeanDefinitionBuilder
+                    .genericBeanDefinition(RedisClientImpl.class);
+            clientBeanDefinitionBuilder.addConstructorArgValue(conf);
+            clientBeanDefinitionBuilder.addPropertyValue("config", conf);
+            clientBeanDefinitionBuilder
+                    .addPropertyValue("pool", APPLICATION_CONTEXT.getBean(conf.getRedisType(), RedisClientPool.class));
+            BeanDefinition clientBeanDefinition = poolBeanDefinitionBuilder.getBeanDefinition();
+            BEAN_FACTORY.registerBeanDefinition(conf.getRedisType(), clientBeanDefinition);
 
             return new ShardedJedisPool(getJedisPoolConfig(conf), shards, Hashing.MURMUR_HASH,
                     Sharded.DEFAULT_KEY_TAG_PATTERN);
@@ -386,7 +369,11 @@ public class RedisClientPool implements EmbeddedValueResolverAware {
         }
     }
 
-    // 设置redis连接池的属性
+    /**
+     * 设置redis连接池的属性
+     * @param conf RedisConfig
+     * @return JedisPoolConfig
+     */
     private JedisPoolConfig getJedisPoolConfig(final RedisConfig conf) {
         Assert.notNull(conf);
 
@@ -436,7 +423,7 @@ public class RedisClientPool implements EmbeddedValueResolverAware {
         if (shardedJedis == null) {
             return;
         }
-
         shardedJedis.close();
     }
+
 }

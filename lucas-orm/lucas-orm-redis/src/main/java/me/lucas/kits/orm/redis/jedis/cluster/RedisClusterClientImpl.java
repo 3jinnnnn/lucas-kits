@@ -34,6 +34,7 @@ import me.lucas.kits.orm.redis.jedis.RedisConfig;
 import me.lucas.kits.orm.redis.jedis.exception.RedisClientException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.BinaryClient.LIST_POSITION;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.ScanParams;
@@ -46,17 +47,18 @@ import redis.clients.jedis.exceptions.JedisClusterException;
  * @since 1.3.12
  */
 public class RedisClusterClientImpl extends AbstractRedisClient implements RedisClient {
-    private static final RedisClientPool POOL = RedisClientPool.getInstance();
+    @Autowired
+    private RedisClientPool pool;
     protected JedisCluster cluster;
 
     public RedisClusterClientImpl(final String type) {
         super(type);
-        cluster = POOL.getJedisCluster(type);
+        cluster = pool.getJedisCluster(type);
     }
 
     public RedisClusterClientImpl(final RedisConfig config) {
         super(config);
-        cluster = POOL.appendJedisCluster(config);
+        cluster = pool.appendJedisCluster(config);
     }
 
     @Override

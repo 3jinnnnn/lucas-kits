@@ -71,8 +71,7 @@ public abstract class AbstractRedisClient implements RedisClient {
 
     protected RedisConfig config;
 
-    @Autowired
-    private RedisClientPool pool;
+    protected RedisClientPool pool;
 
     public AbstractRedisClient() {
     }

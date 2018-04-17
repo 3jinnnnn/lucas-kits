@@ -15,8 +15,6 @@
  */
 package me.lucas.kits.orm.redis.jedis.sharded;
 
-//import static me.lucas.kits.orm.redis.jedis.RedisClientPool.pool;
-
 import com.alibaba.fastjson.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -51,13 +49,15 @@ import redis.clients.jedis.ShardedJedis;
 import redis.clients.jedis.ShardedJedisPipeline;
 import redis.clients.jedis.Tuple;
 
-@Component
+/**
+ * Created by zhangxin on 2018/4/17-上午10:31.
+ *
+ * @author zhangxin
+ * @version 1.0
+ */
 public class RedisClientImpl extends AbstractRedisClient {
 
-    @Autowired
-    private RedisClientPool pool;
-
-    public RedisClientImpl() {}
+    private RedisClientImpl() {}
 
     public RedisClientImpl(final String type) {
         super(type);
@@ -192,8 +192,8 @@ public class RedisClientImpl extends AbstractRedisClient {
             jedis = pool.getJedis(config.getRedisType());
             Set<String> keys = new LinkedHashSet<>();
             Collection<Jedis> allShards = jedis.getAllShards();
-            for (Jedis _jedis : allShards) {
-                keys.addAll(_jedis.keys(pattern));
+            for (Jedis jedis0 : allShards) {
+                keys.addAll(jedis0.keys(pattern));
             }
 
             return keys;
