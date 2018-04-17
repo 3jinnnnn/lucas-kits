@@ -114,16 +114,16 @@ public abstract class AbstractRedisClient implements RedisClient {
             Assert.notNull(shardedJedis, "Not found ShardedJedis.");
             return shardedJedis;
         } catch (final Throwable e) {
-            close();
+            close(shardedJedis);
             throw new RedisClientException(e.getMessage(), e);
         }
     }
 
-    public void close() {
-        if (pool == null) {
+    public void close(final ShardedJedis shardedJedis) {
+        if (shardedJedis == null) {
             return;
         }
-        pool.close();
+        shardedJedis.close();
     }
 
     /**

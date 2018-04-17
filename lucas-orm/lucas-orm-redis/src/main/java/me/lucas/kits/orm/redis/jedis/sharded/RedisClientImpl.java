@@ -69,7 +69,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -89,7 +89,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -119,7 +119,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -134,7 +134,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -149,7 +149,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -164,7 +164,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -185,7 +185,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -208,7 +208,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -223,7 +223,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -247,7 +247,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -263,7 +263,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -279,7 +279,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -301,7 +301,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -317,7 +317,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -336,7 +336,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -360,7 +360,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -376,7 +376,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -390,7 +390,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -409,7 +409,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -428,7 +428,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -447,7 +447,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -466,7 +466,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -485,7 +485,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -512,7 +512,7 @@ public class RedisClientImpl extends AbstractRedisClient {
 
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(shardedJedis);
         }
     }
 
@@ -528,7 +528,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -544,7 +544,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -560,7 +560,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -585,7 +585,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -600,7 +600,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -615,7 +615,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -630,7 +630,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -647,7 +647,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -665,7 +665,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -682,7 +682,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -707,7 +707,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -722,7 +722,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -738,7 +738,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -759,7 +759,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -780,7 +780,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -812,7 +812,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -857,7 +857,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -896,7 +896,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -916,7 +916,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -931,7 +931,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -956,7 +956,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -971,7 +971,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -994,7 +994,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1045,7 +1045,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1075,7 +1075,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1129,7 +1129,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1188,7 +1188,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1233,7 +1233,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1247,7 +1247,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1265,7 +1265,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1280,7 +1280,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1295,7 +1295,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1309,7 +1309,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1327,7 +1327,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1356,7 +1356,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1370,7 +1370,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1393,7 +1393,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1427,7 +1427,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1457,7 +1457,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1486,7 +1486,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1519,7 +1519,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1534,7 +1534,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1548,7 +1548,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1582,7 +1582,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1596,7 +1596,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1610,7 +1610,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1624,7 +1624,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1638,7 +1638,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1656,7 +1656,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1679,7 +1679,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1712,7 +1712,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1726,7 +1726,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1741,7 +1741,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1761,7 +1761,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1775,7 +1775,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1789,7 +1789,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1805,7 +1805,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1821,7 +1821,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1836,7 +1836,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1850,7 +1850,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1867,7 +1867,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1893,7 +1893,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1909,7 +1909,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1926,7 +1926,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1953,7 +1953,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1980,7 +1980,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -1995,7 +1995,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2010,7 +2010,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2026,7 +2026,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2040,7 +2040,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2056,7 +2056,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2070,7 +2070,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2086,7 +2086,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2103,7 +2103,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2128,7 +2128,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2142,7 +2142,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2157,7 +2157,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2182,7 +2182,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2207,7 +2207,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2221,7 +2221,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2236,7 +2236,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 
@@ -2260,7 +2260,7 @@ public class RedisClientImpl extends AbstractRedisClient {
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
-            close();
+            close(jedis);
         }
     }
 }
