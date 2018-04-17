@@ -36,6 +36,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import me.lucas.kits.commons.utils.Assert;
 import me.lucas.kits.commons.utils.CollectionUtils;
+import me.lucas.kits.orm.redis.jedis.config.RedisConfig;
 import me.lucas.kits.orm.redis.jedis.exception.RedisClientException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;

@@ -29,8 +29,7 @@ import me.lucas.kits.commons.utils.Assert;
 import me.lucas.kits.commons.utils.CollectionUtils;
 import me.lucas.kits.orm.redis.jedis.AbstractRedisClient;
 import me.lucas.kits.orm.redis.jedis.RedisClient;
-import me.lucas.kits.orm.redis.jedis.RedisClientPool;
-import me.lucas.kits.orm.redis.jedis.RedisConfig;
+import me.lucas.kits.orm.redis.jedis.config.RedisClientConfig;
 import me.lucas.kits.orm.redis.jedis.exception.RedisClientException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -48,7 +47,7 @@ import redis.clients.jedis.exceptions.JedisClusterException;
  */
 public class RedisClusterClientImpl extends AbstractRedisClient implements RedisClient {
     @Autowired
-    private RedisClientPool pool;
+    private RedisClientConfig pool;
     protected JedisCluster cluster;
 
 //    public RedisClusterClientImpl(final String type) {

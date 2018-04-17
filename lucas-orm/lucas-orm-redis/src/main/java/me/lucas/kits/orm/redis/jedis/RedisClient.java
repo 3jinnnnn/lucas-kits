@@ -23,6 +23,7 @@ import me.lucas.kits.orm.redis.jedis.commands.KeyValueRedisClient;
 import me.lucas.kits.orm.redis.jedis.commands.ListRedisClient;
 import me.lucas.kits.orm.redis.jedis.commands.SetRedisClient;
 import me.lucas.kits.orm.redis.jedis.commands.SortedSetRedisClient;
+import me.lucas.kits.orm.redis.jedis.config.RedisConfig;
 
 /**
  * 针对Jedis池的使用而基础的封装，主要针对Sharding模式进行接口API的定义<br>

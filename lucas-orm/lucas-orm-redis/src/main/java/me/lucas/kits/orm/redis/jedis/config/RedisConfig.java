@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.lucas.kits.orm.redis.jedis;
+package me.lucas.kits.orm.redis.jedis.config;
 
 import java.util.Properties;
 import me.lucas.kits.commons.entity.BaseEntity;
