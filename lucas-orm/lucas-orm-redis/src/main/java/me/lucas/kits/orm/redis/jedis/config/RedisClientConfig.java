@@ -45,6 +45,7 @@ import org.springframework.stereotype.Component;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.JedisSentinelPool;
 import redis.clients.jedis.JedisShardInfo;
 import redis.clients.jedis.ShardedJedisPool;
 import redis.clients.util.Hashing;
@@ -200,8 +201,15 @@ public class RedisClientConfig implements ApplicationContextAware {
             final String[] hostAndports = config.getHostNames().split(";");
             final List<String> redisHosts = Lists.newArrayList();
             final List<Integer> redisPorts = Lists.newArrayList();
-            for (String hostAndport : hostAndports) {
-                final String[] hostPort = hostAndport.split(":");
+            String master = null;
+            final Set<String> sentinels = Sets.newHashSet();
+            for (int i = 0; i < hostAndports.length; i++) {
+                if (i == 0) {
+                    master = hostAndports[i];
+                } else {
+                    sentinels.add(hostAndports[i]);
+                }
+                final String[] hostPort = hostAndports[i].split(":");
                 redisHosts.add(hostPort[0]);
                 redisPorts.add(Integer.valueOf(hostPort[1]));
             }
@@ -222,7 +230,22 @@ public class RedisClientConfig implements ApplicationContextAware {
             if (maxRedirections == null || maxRedirections < 0) {
                 maxRedirections = DEFAULT_MAX_REDIRECTIONS;
             }
-
+            // 注册ShardedJedisPool
+            BeanDefinitionBuilder poolBeanDefinitionBuilder = BeanDefinitionBuilder
+                    .genericBeanDefinition(JedisSentinelPool.class);
+            poolBeanDefinitionBuilder.addConstructorArgValue(master);
+            poolBeanDefinitionBuilder.addConstructorArgValue(sentinels);
+            poolBeanDefinitionBuilder.addConstructorArgValue(getJedisPoolConfig(config));
+            poolBeanDefinitionBuilder.addConstructorArgValue(timeout);
+            BeanDefinition poolBeanDefinition = poolBeanDefinitionBuilder.getBeanDefinition();
+            BEAN_FACTORY.registerBeanDefinition(POOL_PRIFIX + config.getRedisType(), poolBeanDefinition);
+            // 注册RedisClientImpl
+            BeanDefinitionBuilder clientBeanDefinitionBuilder = BeanDefinitionBuilder
+                    .genericBeanDefinition(RedisClientImpl.class);
+            clientBeanDefinitionBuilder.addPropertyValue("config", config);
+            clientBeanDefinitionBuilder.addPropertyReference("pool", POOL_PRIFIX + config.getRedisType());
+            BeanDefinition clientBeanDefinition = clientBeanDefinitionBuilder.getBeanDefinition();
+            BEAN_FACTORY.registerBeanDefinition(REDIS_PRIFIX + config.getRedisType(), clientBeanDefinition);
             return new JedisCluster(nodes, timeout, maxRedirections, getJedisPoolConfig(config));
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
