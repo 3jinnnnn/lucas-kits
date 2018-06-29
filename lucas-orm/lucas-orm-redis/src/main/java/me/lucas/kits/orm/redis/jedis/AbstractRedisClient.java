@@ -108,7 +108,7 @@ public abstract class AbstractRedisClient implements RedisClient {
         try {
             if (pool != null) {
                 boolean closed = pool.isClosed();
-                log.info(String.valueOf(closed));
+                log.debug(String.valueOf(closed));
                 shardedJedis = pool.getResource();
             }
             Assert.notNull(shardedJedis, "Not found ShardedJedis.");

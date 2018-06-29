@@ -20,6 +20,7 @@
   <modules>
     <module>lucas-orm-redis</module>
     <module>lucas-orm-activemq</module>
+    <module>lcuas-orm-redisson</module>
   </modules>
 
   <dependencies>
