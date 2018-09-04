@@ -8,7 +8,7 @@
 <dependency>
     <groupId>me.lucas</groupId>
     <artifactId>lucas-orm-redis</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -42,6 +42,18 @@ redis.other.maxIdle=10
 redis.other.timeOut=5000
 redis.other.testOnBorrow=false
 redis.other.expireTime=3600
+
+# 哨兵模式
+// 该配置项为masterName
+redis.sentinel.redisType=masterName
+redis.sentinel.hostNames=127.0.0.1:6379;127.0.0.1:6380;127.0.0.1:6381
+redis.sentinel.maxTotal=20
+redis.sentinel.maxIdle=5
+redis.sentinel.timeOut=2000
+redis.sentinel.testOnBorrow=true
+redis.sentinel.expireTime=3600
+// 该配置项声明其为哨兵模式
+redis.sentinel.sentinel=true
 ```
 
 ### 2.4 使用

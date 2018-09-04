@@ -28,7 +28,8 @@ import me.lucas.kits.orm.redis.jedis.exception.NotFoundExtendException;
  * @since 1.0
  */
 public class RedisConfig extends BaseEntity {
-    private static final long serialVersionUID = 4457350932293696381L;
+
+    private static final long serialVersionUID = -6957473106901833919L;
 
     public static final String SEPARATOR = ".";
     public static final String REDIS = "redis.";

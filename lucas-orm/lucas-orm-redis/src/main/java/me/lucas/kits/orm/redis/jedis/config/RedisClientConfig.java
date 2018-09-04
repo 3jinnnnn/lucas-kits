@@ -31,6 +31,7 @@ import me.lucas.kits.commons.loader.LoaderException;
 import me.lucas.kits.commons.loader.PropertiesLoader;
 import me.lucas.kits.commons.utils.Assert;
 import me.lucas.kits.orm.redis.jedis.exception.RedisClientException;
+import me.lucas.kits.orm.redis.jedis.sentinel.RedisSentinelClientImpl;
 import me.lucas.kits.orm.redis.jedis.sharded.RedisClientImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -43,7 +44,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.HostAndPort;
-import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisSentinelPool;
 import redis.clients.jedis.JedisShardInfo;
@@ -63,6 +63,7 @@ import redis.clients.util.Sharded;
 @Slf4j
 @Component
 public class RedisClientConfig implements ApplicationContextAware {
+    /** Redis配置文件路径 */
     public static final String MAIN_REDIS = "/redis.properties";
     public static final String POOL_PRIFIX = "pool:";
     public static final String REDIS_PRIFIX = "redis:";
@@ -97,6 +98,13 @@ public class RedisClientConfig implements ApplicationContextAware {
         }
     }
 
+    /**
+     * 预处理.properties配置文件为对象列.
+     *
+     * @param redis redis.properties配制文件数据组
+     * @throws LoaderException LoaderException
+     * @throws IOException IOException
+     */
     public void initRedisConfig(final Properties... redis) throws LoaderException, IOException {
         List<Properties> redises = new ArrayList<>();
         if (redis == null || redis.length == 0) {
@@ -114,17 +122,16 @@ public class RedisClientConfig implements ApplicationContextAware {
                     final RedisConfig conf = RedisConfig.newInstance();
                     for (String name : conf.attributeNames()) {
                         if (RedisConfig.REDIS_TYPE.equals(name)) {
+                            // 校验redis.*.redisType属性值非空
                             Assert.hasLength(rds.getProperty(RedisConfig.REDIS + idx + '.' + name));
                         } else if (RedisConfig.EXTEND_PROPERTIES.equals(name)) {
                             continue;
                         }
-
                         conf.setAttributeValue(name, rds.getProperty(RedisConfig.REDIS + idx + '.' + name));
                     }
 
                     confs.put(conf.getRedisType(), conf);
                 }
-
                 redisConfigs.putAll(confs);
             }
         }
@@ -149,7 +156,7 @@ public class RedisClientConfig implements ApplicationContextAware {
      * @param conf RedisConfig
      * @return ShardedJedisPool
      */
-    private ShardedJedisPool createJedisPool(final RedisConfig conf) {
+    private void createJedisPool(final RedisConfig conf) {
         Assert.notNull(conf);
         try {
             final String[] hostAndports = conf.getHostNames().split(";");
@@ -163,14 +170,14 @@ public class RedisClientConfig implements ApplicationContextAware {
 
             final List<JedisShardInfo> shards = Lists.newArrayList();
             for (int i = 0; i < redisHosts.size(); i++) {
-                final String host = (String) redisHosts.get(i);
-                final Integer port = (Integer) redisPorts.get(i);
+                final String host = redisHosts.get(i);
+                final Integer port = redisPorts.get(i);
                 Integer timeout = conf.getTimeOut();
                 if (timeout == null || timeout < 0) {
                     timeout = DEFAULT_TIMEOUT;
                 }
 
-                JedisShardInfo si = new JedisShardInfo(host, port.intValue(), timeout);
+                JedisShardInfo si = new JedisShardInfo(host, port, timeout);
                 shards.add(si);
             }
 
@@ -191,14 +198,12 @@ public class RedisClientConfig implements ApplicationContextAware {
             clientBeanDefinitionBuilder.addPropertyReference("pool", POOL_PRIFIX + conf.getRedisType());
             BeanDefinition clientBeanDefinition = clientBeanDefinitionBuilder.getBeanDefinition();
             BEAN_FACTORY.registerBeanDefinition(REDIS_PRIFIX + conf.getRedisType(), clientBeanDefinition);
-            return new ShardedJedisPool(getJedisPoolConfig(conf), shards, Hashing.MURMUR_HASH,
-                    Sharded.DEFAULT_KEY_TAG_PATTERN);
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         }
     }
 
-    private JedisCluster createJedisClusterPool(final RedisConfig config) {
+    private void createJedisClusterPool(final RedisConfig config) {
         Assert.notNull(config);
         try {
             final String[] hostAndports = config.getHostNames().split(";");
@@ -219,8 +224,8 @@ public class RedisClientConfig implements ApplicationContextAware {
 
             final Set<HostAndPort> nodes = Sets.newLinkedHashSet();
             for (int i = 0; i < redisHosts.size(); i++) {
-                final String host = (String) redisHosts.get(i);
-                final int port = (Integer) redisPorts.get(i);
+                final String host = redisHosts.get(i);
+                final int port = redisPorts.get(i);
                 nodes.add(new HostAndPort(host, port));
             }
 
@@ -249,48 +254,31 @@ public class RedisClientConfig implements ApplicationContextAware {
             clientBeanDefinitionBuilder.addPropertyReference("pool", POOL_PRIFIX + config.getRedisType());
             BeanDefinition clientBeanDefinition = clientBeanDefinitionBuilder.getBeanDefinition();
             BEAN_FACTORY.registerBeanDefinition(REDIS_PRIFIX + config.getRedisType(), clientBeanDefinition);
-            return new JedisCluster(nodes, timeout, maxRedirections, getJedisPoolConfig(config));
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         }
     }
 
-    private JedisSentinelPool createJedisSentinelPool(final RedisConfig config) {
+    private void createJedisSentinelPool(final RedisConfig config) {
         Assert.notNull(config);
         try {
             final String[] hostAndports = config.getHostNames().split(";");
             final List<String> redisHosts = Lists.newArrayList();
             final List<Integer> redisPorts = Lists.newArrayList();
-            String master = null;
+            String master = config.getRedisType();
             final Set<String> sentinels = Sets.newHashSet();
             for (int i = 0; i < hostAndports.length; i++) {
-                if (i == 0) {
-                    master = hostAndports[i];
-                } else {
-                    sentinels.add(hostAndports[i]);
-                }
+                sentinels.add(hostAndports[i]);
                 final String[] hostPort = hostAndports[i].split(":");
                 redisHosts.add(hostPort[0]);
                 redisPorts.add(Integer.valueOf(hostPort[1]));
-            }
-
-            final Set<HostAndPort> nodes = Sets.newLinkedHashSet();
-            for (int i = 0; i < redisHosts.size(); i++) {
-                final String host = (String) redisHosts.get(i);
-                final int port = (Integer) redisPorts.get(i);
-                nodes.add(new HostAndPort(host, port));
             }
 
             Integer timeout = config.getTimeOut();
             if (timeout == null || timeout < 0) {
                 timeout = DEFAULT_TIMEOUT;
             }
-
-            Integer maxRedirections = config.getMaxRedirections();
-            if (maxRedirections == null || maxRedirections < 0) {
-                maxRedirections = DEFAULT_MAX_REDIRECTIONS;
-            }
-            // 注册ShardedJedisPool
+            // JedisSentinelPool
             BeanDefinitionBuilder poolBeanDefinitionBuilder = BeanDefinitionBuilder
                     .genericBeanDefinition(JedisSentinelPool.class);
             poolBeanDefinitionBuilder.addConstructorArgValue(master);
@@ -299,14 +287,14 @@ public class RedisClientConfig implements ApplicationContextAware {
             poolBeanDefinitionBuilder.addConstructorArgValue(timeout);
             BeanDefinition poolBeanDefinition = poolBeanDefinitionBuilder.getBeanDefinition();
             BEAN_FACTORY.registerBeanDefinition(POOL_PRIFIX + config.getRedisType(), poolBeanDefinition);
+            JedisSentinelPool pool = new JedisSentinelPool(master, sentinels, getJedisPoolConfig(config), timeout);
             // 注册RedisClientImpl
             BeanDefinitionBuilder clientBeanDefinitionBuilder = BeanDefinitionBuilder
-                    .genericBeanDefinition(RedisClientImpl.class);
+                    .genericBeanDefinition(RedisSentinelClientImpl.class);
             clientBeanDefinitionBuilder.addPropertyValue("config", config);
             clientBeanDefinitionBuilder.addPropertyReference("pool", POOL_PRIFIX + config.getRedisType());
             BeanDefinition clientBeanDefinition = clientBeanDefinitionBuilder.getBeanDefinition();
             BEAN_FACTORY.registerBeanDefinition(REDIS_PRIFIX + config.getRedisType(), clientBeanDefinition);
-            return new JedisSentinelPool(config.getRedisType(), Sets.newHashSet(hostAndports), getJedisPoolConfig(config), timeout);
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         }
