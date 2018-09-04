@@ -87,6 +87,13 @@ public class RedisConfig extends BaseEntity {
     private Boolean cluster;
 
     /**
+     * Jedis Sentinel模式.
+     *
+     * @since 1.3.12
+     */
+    private Boolean sentinel;
+
+    /**
      * @since 1.3.12
      */
     private Integer maxRedirections;
@@ -244,5 +251,13 @@ public class RedisConfig extends BaseEntity {
 
     public void setLockGroup(final String lockGroup) {
         this.lockGroup = lockGroup;
+    }
+
+    public Boolean getSentinel() {
+        return sentinel;
+    }
+
+    public void setSentinel(Boolean sentinel) {
+        this.sentinel = sentinel;
     }
 }

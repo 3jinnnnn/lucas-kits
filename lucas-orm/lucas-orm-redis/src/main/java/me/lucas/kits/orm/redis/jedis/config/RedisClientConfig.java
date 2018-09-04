@@ -134,10 +134,13 @@ public class RedisClientConfig implements ApplicationContextAware {
      * 初始化连接池.
      */
     public void createJedis() {
-        redisConfigs.values().stream().filter(conf -> conf.getCluster() == null || !conf.getCluster())
-                .forEach(this::createJedisPool);
+        redisConfigs.values().stream()
+                .filter(conf -> (conf.getCluster() == null || !conf.getCluster()) && (conf.getSentinel() == null
+                        || !conf.getSentinel())).forEach(this::createJedisPool);
         redisConfigs.values().stream().filter(conf -> conf.getCluster() != null && conf.getCluster())
                 .forEach(this::createJedisClusterPool);
+        redisConfigs.values().stream().filter(conf -> conf.getSentinel() != null && conf.getSentinel())
+                .forEach(this::createJedisSentinelPool);
     }
 
     /**
@@ -247,6 +250,63 @@ public class RedisClientConfig implements ApplicationContextAware {
             BeanDefinition clientBeanDefinition = clientBeanDefinitionBuilder.getBeanDefinition();
             BEAN_FACTORY.registerBeanDefinition(REDIS_PRIFIX + config.getRedisType(), clientBeanDefinition);
             return new JedisCluster(nodes, timeout, maxRedirections, getJedisPoolConfig(config));
+        } catch (final Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        }
+    }
+
+    private JedisSentinelPool createJedisSentinelPool(final RedisConfig config) {
+        Assert.notNull(config);
+        try {
+            final String[] hostAndports = config.getHostNames().split(";");
+            final List<String> redisHosts = Lists.newArrayList();
+            final List<Integer> redisPorts = Lists.newArrayList();
+            String master = null;
+            final Set<String> sentinels = Sets.newHashSet();
+            for (int i = 0; i < hostAndports.length; i++) {
+                if (i == 0) {
+                    master = hostAndports[i];
+                } else {
+                    sentinels.add(hostAndports[i]);
+                }
+                final String[] hostPort = hostAndports[i].split(":");
+                redisHosts.add(hostPort[0]);
+                redisPorts.add(Integer.valueOf(hostPort[1]));
+            }
+
+            final Set<HostAndPort> nodes = Sets.newLinkedHashSet();
+            for (int i = 0; i < redisHosts.size(); i++) {
+                final String host = (String) redisHosts.get(i);
+                final int port = (Integer) redisPorts.get(i);
+                nodes.add(new HostAndPort(host, port));
+            }
+
+            Integer timeout = config.getTimeOut();
+            if (timeout == null || timeout < 0) {
+                timeout = DEFAULT_TIMEOUT;
+            }
+
+            Integer maxRedirections = config.getMaxRedirections();
+            if (maxRedirections == null || maxRedirections < 0) {
+                maxRedirections = DEFAULT_MAX_REDIRECTIONS;
+            }
+            // 注册ShardedJedisPool
+            BeanDefinitionBuilder poolBeanDefinitionBuilder = BeanDefinitionBuilder
+                    .genericBeanDefinition(JedisSentinelPool.class);
+            poolBeanDefinitionBuilder.addConstructorArgValue(master);
+            poolBeanDefinitionBuilder.addConstructorArgValue(sentinels);
+            poolBeanDefinitionBuilder.addConstructorArgValue(getJedisPoolConfig(config));
+            poolBeanDefinitionBuilder.addConstructorArgValue(timeout);
+            BeanDefinition poolBeanDefinition = poolBeanDefinitionBuilder.getBeanDefinition();
+            BEAN_FACTORY.registerBeanDefinition(POOL_PRIFIX + config.getRedisType(), poolBeanDefinition);
+            // 注册RedisClientImpl
+            BeanDefinitionBuilder clientBeanDefinitionBuilder = BeanDefinitionBuilder
+                    .genericBeanDefinition(RedisClientImpl.class);
+            clientBeanDefinitionBuilder.addPropertyValue("config", config);
+            clientBeanDefinitionBuilder.addPropertyReference("pool", POOL_PRIFIX + config.getRedisType());
+            BeanDefinition clientBeanDefinition = clientBeanDefinitionBuilder.getBeanDefinition();
+            BEAN_FACTORY.registerBeanDefinition(REDIS_PRIFIX + config.getRedisType(), clientBeanDefinition);
+            return new JedisSentinelPool(config.getRedisType(), Sets.newHashSet(hostAndports), getJedisPoolConfig(config), timeout);
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         }
