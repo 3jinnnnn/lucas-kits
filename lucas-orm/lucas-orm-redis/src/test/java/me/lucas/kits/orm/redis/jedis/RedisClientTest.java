@@ -27,7 +27,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 public class RedisClientTest {
 
     @Autowired
-    @Qualifier(RedisClientConfig.REDIS_PRIFIX + "shiro")
+    @Qualifier(RedisClientConfig.REDIS_PRIFIX + "main")
     private RedisClient redis;
 
     @Test
@@ -35,7 +35,5 @@ public class RedisClientTest {
         Properties properties = PropertiesLoader.load("redis.properties");
         log.info(JSON.toJSONString(properties));
         log.info(redis.get("123"));
-        //        String info = shiro.getResource().get("123");
-        //        log.info(JSON.toJSONString(info));
     }
 }

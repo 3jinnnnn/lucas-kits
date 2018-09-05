@@ -1312,4 +1312,16 @@ public abstract class AbstractSentinelRedisClient implements RedisClient {
             return ResultType.UNSUCCESS_ERROR;
         }
     }
+
+    @Override
+    public ResultType refreshCache(String key, String value, long ttl, RefreshType refreshType, long timestamp,
+            long refreshTtl) {
+        try {
+            Object eval = eval(REFRESH_CACHE_SCRIPT, 1, key, value, String.valueOf(ttl), refreshType.name(),
+                    String.valueOf(timestamp), String.valueOf(refreshTtl));
+            return ResultType.valueOf(eval.toString());
+        } catch (Exception e) {
+            return ResultType.UNSUCCESS_ERROR;
+        }
+    }
 }

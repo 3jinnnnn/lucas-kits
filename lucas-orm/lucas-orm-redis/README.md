@@ -2,13 +2,13 @@
 ## 1. 简介
 使用Jedis方式连接Redis工具类, 支持Shard模式, 集群模式暂未适配
 
-## 2. 使用
+## 2. 配置
 ### 2.1 实际开发工程的pom.xml中引入当前工具
 ``` xml
 <dependency>
     <groupId>me.lucas</groupId>
     <artifactId>lucas-orm-redis</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -56,7 +56,7 @@ redis.sentinel.expireTime=3600
 redis.sentinel.sentinel=true
 ```
 
-### 2.4 使用
+## 3. 使用
 在需要的地方注入即可, 注意要加前缀"reids:"
 ```java
 @Autowired
