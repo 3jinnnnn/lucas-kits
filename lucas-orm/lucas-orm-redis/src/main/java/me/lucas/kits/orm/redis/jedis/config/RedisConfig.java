@@ -16,6 +16,9 @@
 package me.lucas.kits.orm.redis.jedis.config;
 
 import java.util.Properties;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import me.lucas.kits.commons.entity.BaseEntity;
 import me.lucas.kits.commons.loader.PropertiesLoader;
 import me.lucas.kits.commons.utils.StringUtils;
@@ -27,6 +30,9 @@ import me.lucas.kits.orm.redis.jedis.exception.NotFoundExtendException;
  * @author yanghe
  * @since 1.0
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RedisConfig extends BaseEntity {
 
     private static final long serialVersionUID = -6957473106901833919L;
@@ -59,6 +65,11 @@ public class RedisConfig extends BaseEntity {
     private Boolean testOnBorrow;
     private Integer expireTime;
 
+    // Jedis Sentinel模式.
+    private Boolean sentinel;
+    // Jedis Sentinel模式 Mater Name.
+    private String sentinelMasterName;
+
     /**
      * RedisClient扩展.
      *
@@ -88,13 +99,6 @@ public class RedisConfig extends BaseEntity {
     private Boolean cluster;
 
     /**
-     * Jedis Sentinel模式.
-     *
-     * @since 1.3.12
-     */
-    private Boolean sentinel;
-
-    /**
      * @since 1.3.12
      */
     private Integer maxRedirections;
@@ -109,79 +113,8 @@ public class RedisConfig extends BaseEntity {
      */
     private String lockGroup;
 
-    private RedisConfig() {
-    }
-
     public static final RedisConfig newInstance() {
         return new RedisConfig();
-    }
-
-    public String getRedisType() {
-        return redisType;
-    }
-
-    public void setRedisType(final String redisType) {
-        this.redisType = redisType;
-    }
-
-    public String getHostNames() {
-        return hostNames;
-    }
-
-    public void setHostNames(final String hostNames) {
-        this.hostNames = hostNames;
-    }
-
-    public Integer getMaxTotal() {
-        return maxTotal;
-    }
-
-    public void setMaxTotal(final Integer maxTotal) {
-        this.maxTotal = maxTotal;
-    }
-
-    public Integer getMaxIdle() {
-        return maxIdle;
-    }
-
-    public void setMaxIdle(final Integer maxIdle) {
-        this.maxIdle = maxIdle;
-    }
-
-    public Integer getMinIdle() {
-        return minIdle;
-    }
-
-    public void setMinIdle(final Integer minIdle) {
-        this.minIdle = minIdle;
-    }
-
-    public Integer getTimeOut() {
-        return timeOut;
-    }
-
-    public void setTimeOut(final Integer timeOut) {
-        this.timeOut = timeOut;
-    }
-
-    public Boolean getTestOnBorrow() {
-        return testOnBorrow;
-    }
-
-    public void setTestOnBorrow(final Boolean testOnBorrow) {
-        this.testOnBorrow = testOnBorrow;
-    }
-
-    public Integer getExpireTime() {
-        return expireTime == null ? Integer.valueOf(0) : expireTime;
-    }
-
-    public void setExpireTime(final Integer expireTime) {
-        this.expireTime = expireTime;
-    }
-
-    public String getExtend() {
-        return extend;
     }
 
     public void setExtend(final String extend) {
@@ -196,10 +129,6 @@ public class RedisConfig extends BaseEntity {
         this.extend = extend;
     }
 
-    public String getExtendResource() {
-        return extendResource;
-    }
-
     public void setExtendResource(final String extendResource) {
         this.extendResource = extendResource;
         if (StringUtils.isNotBlank(extendResource)) {
@@ -212,53 +141,5 @@ public class RedisConfig extends BaseEntity {
                 setExtendProperties(extendProperties);
             }
         }
-    }
-
-    public Properties getExtendProperties() {
-        return extendProperties;
-    }
-
-    public void setExtendProperties(final Properties extendProperties) {
-        this.extendProperties = extendProperties;
-    }
-
-    public Boolean getCluster() {
-        return cluster;
-    }
-
-    public void setCluster(final Boolean cluster) {
-        this.cluster = cluster;
-    }
-
-    public Integer getMaxRedirections() {
-        return maxRedirections;
-    }
-
-    public void setMaxRedirections(final Integer maxRedirections) {
-        this.maxRedirections = maxRedirections;
-    }
-
-    public Integer getLockTimeout() {
-        return lockTimeout;
-    }
-
-    public void setLockTimeout(final Integer lockTimeout) {
-        this.lockTimeout = lockTimeout;
-    }
-
-    public String getLockGroup() {
-        return lockGroup;
-    }
-
-    public void setLockGroup(final String lockGroup) {
-        this.lockGroup = lockGroup;
-    }
-
-    public Boolean getSentinel() {
-        return sentinel;
-    }
-
-    public void setSentinel(Boolean sentinel) {
-        this.sentinel = sentinel;
     }
 }

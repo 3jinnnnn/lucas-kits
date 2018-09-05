@@ -1532,4 +1532,49 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
             throw new RedisClientException(e.getMessage(), e);
         }
     }
+
+    @Override
+    public Object eval(String script, int keyCount, String... params) {
+        return cluster.eval(script, keyCount, params);
+    }
+
+    @Override
+    public Object eval(String script, List<String> keys, List<String> args) {
+        return cluster.eval(script, keys, args);
+    }
+
+    @Override
+    public Object eval(String script) {
+        return cluster.eval(script, null);
+    }
+
+    @Override
+    public Object evalsha(String script) {
+        return cluster.evalsha(script, null);
+    }
+
+    @Override
+    public Object evalsha(String sha1, List<String> keys, List<String> args) {
+        return cluster.evalsha(sha1, keys, args);
+    }
+
+    @Override
+    public Object evalsha(String sha1, int keyCount, String... params) {
+        return cluster.evalsha(sha1, keyCount, params);
+    }
+
+    @Override
+    public Boolean scriptExists(String sha1) {
+        return cluster.scriptExists(sha1, "");
+    }
+
+    @Override
+    public List<Boolean> scriptExists(String... sha1) {
+        return cluster.scriptExists(null,sha1 );
+    }
+
+    @Override
+    public String scriptLoad(String script) {
+        return cluster.scriptLoad(script, null);
+    }
 }

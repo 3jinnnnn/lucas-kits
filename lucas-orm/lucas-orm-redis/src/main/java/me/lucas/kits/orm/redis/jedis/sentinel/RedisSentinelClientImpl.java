@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -39,6 +40,7 @@ import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Response;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
+import redis.clients.jedis.ShardedJedis;
 import redis.clients.jedis.Tuple;
 
 /**
@@ -2116,6 +2118,125 @@ public class RedisSentinelClientImpl extends AbstractSentinelRedisClient {
             tuples.forEach(tuple -> newTuples.add(new AbstractMap.SimpleEntry<>(tuple.getElement(), tuple.getScore())));
             return new ScanResult<>(res.getStringCursor(), newTuples);
         } catch (final Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public Object eval(String script, int keyCount, String... params) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+
+            return jedis.eval(script, keyCount, params);
+
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public Object eval(String script, List<String> keys, List<String> args) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            return jedis.eval(script, keys, args);
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public Object eval(String script) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            return jedis.eval(script);
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public Object evalsha(String script) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            return jedis.evalsha(script);
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public Object evalsha(String sha1, List<String> keys, List<String> args) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            return jedis.evalsha(sha1, keys, args);
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public Object evalsha(String sha1, int keyCount, String... params) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            return jedis.evalsha(sha1, keyCount, params);
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public Boolean scriptExists(String sha1) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            return jedis.scriptExists(sha1);
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public List<Boolean> scriptExists(String... sha1) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            return jedis.scriptExists(sha1);
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public String scriptLoad(String script) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            return jedis.scriptLoad(script);
+        } catch (Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         } finally {
             close(jedis);

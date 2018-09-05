@@ -265,7 +265,7 @@ public class RedisClientConfig implements ApplicationContextAware {
             final String[] hostAndports = config.getHostNames().split(";");
             final List<String> redisHosts = Lists.newArrayList();
             final List<Integer> redisPorts = Lists.newArrayList();
-            String master = config.getRedisType();
+            String master = config.getSentinelMasterName();
             final Set<String> sentinels = Sets.newHashSet();
             for (int i = 0; i < hostAndports.length; i++) {
                 sentinels.add(hostAndports[i]);

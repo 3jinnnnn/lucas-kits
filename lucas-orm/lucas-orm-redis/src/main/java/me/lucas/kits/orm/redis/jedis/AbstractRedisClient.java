@@ -21,6 +21,10 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,6 +39,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import me.lucas.kits.commons.utils.Assert;
+import me.lucas.kits.commons.utils.Charsets;
 import me.lucas.kits.commons.utils.CollectionUtils;
 import me.lucas.kits.orm.redis.jedis.config.RedisConfig;
 import me.lucas.kits.orm.redis.jedis.exception.RedisClientException;
@@ -77,6 +82,23 @@ public abstract class AbstractRedisClient implements RedisClient {
      * @since 1.4.10
      */
     public static final ScanParams DEFAULT_SCAN_PARAMS = new ScanParams();
+
+    public static String REFRESH_CACHE_SCRIPT;
+
+    static {
+        File file = null;
+        StringBuilder sb = new StringBuilder();
+        try (InputStream is = AbstractRedisClient.class.getClassLoader().getResourceAsStream("CompareAndCache.lua");
+                BufferedReader br = new BufferedReader(new InputStreamReader(is, Charsets.UTF_8));) {
+            String s;
+            while ((s = br.readLine()) != null) {
+                sb.append(s);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        REFRESH_CACHE_SCRIPT = sb.toString();
+    }
 
     @Getter
     @Setter
@@ -1254,5 +1276,38 @@ public abstract class AbstractRedisClient implements RedisClient {
         entrys.forEach(entry -> newEntrys
                 .add(new AbstractMap.SimpleEntry<>(JSON.parseObject(entry.getKey(), type), entry.getValue())));
         return new ScanResult<>(result.getStringCursor(), newEntrys);
+    }
+
+    @Override
+    public ResultType refreshCache(String key, String value, long ttl) {
+        try {
+            Object eval = eval(REFRESH_CACHE_SCRIPT, 1, key, value, String.valueOf(ttl), RefreshType.SELECT.name());
+            return ResultType.valueOf(eval.toString());
+        } catch (Exception e) {
+            return ResultType.UNSUCCESS_ERROR;
+        }
+    }
+
+    @Override
+    public ResultType refreshCache(String key, String value, long ttl, RefreshType refreshType) {
+        try {
+            Object eval = eval(REFRESH_CACHE_SCRIPT, 1, key, value, String.valueOf(ttl), refreshType.name(),
+                    String.valueOf(System.currentTimeMillis()), "60");
+            return ResultType.valueOf(eval.toString());
+        } catch (Exception e) {
+            return ResultType.UNSUCCESS_ERROR;
+        }
+    }
+
+    @Override
+    public ResultType refreshCache(String key, String value, long ttl, RefreshType refreshType, String timestamp,
+            long refreshTtl) {
+        try {
+            Object eval = eval(REFRESH_CACHE_SCRIPT, 1, key, value, String.valueOf(ttl), refreshType.name(), timestamp,
+                    String.valueOf(refreshTtl));
+            return ResultType.valueOf(eval.toString());
+        } catch (Exception e) {
+            return ResultType.UNSUCCESS_ERROR;
+        }
     }
 }

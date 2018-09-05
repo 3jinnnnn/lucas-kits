@@ -2263,4 +2263,166 @@ public class RedisClientImpl extends AbstractRedisClient {
             close(jedis);
         }
     }
+
+    @Override
+    public Object eval(String script, int keyCount, String... params) {
+        ShardedJedis jedis = null;
+        try {
+            jedis = getJedis();
+            Collection<Jedis> shards = jedis.getAllShards();
+            if (shards.size() == 1) {
+                return shards.iterator().next().eval(script, keyCount, params);
+            } else {
+                throw new RedisClientException("不支持对多节点Sharded模式进行eval操作");
+            }
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public Object eval(String script, List<String> keys, List<String> args) {
+        ShardedJedis jedis = null;
+        try {
+            jedis = getJedis();
+            Collection<Jedis> shards = jedis.getAllShards();
+            if (shards.size() == 1) {
+                return shards.iterator().next().eval(script, keys, args);
+            } else {
+                throw new RedisClientException("不支持对多节点Sharded模式进行eval操作");
+            }
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public Object eval(String script) {
+        ShardedJedis jedis = null;
+        try {
+            jedis = getJedis();
+            Collection<Jedis> shards = jedis.getAllShards();
+            if (shards.size() == 1) {
+                return shards.iterator().next().eval(script);
+            } else {
+                throw new RedisClientException("不支持对多节点Sharded模式进行eval操作");
+            }
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public Object evalsha(String script) {
+        ShardedJedis jedis = null;
+        try {
+            jedis = getJedis();
+            Collection<Jedis> shards = jedis.getAllShards();
+            if (shards.size() == 1) {
+                return shards.iterator().next().evalsha(script);
+            } else {
+                throw new RedisClientException("不支持对多节点Sharded模式进行evalsha操作");
+            }
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public Object evalsha(String sha1, List<String> keys, List<String> args) {
+        ShardedJedis jedis = null;
+        try {
+            jedis = getJedis();
+            Collection<Jedis> shards = jedis.getAllShards();
+            if (shards.size() == 1) {
+                return shards.iterator().next().evalsha(sha1, keys, args);
+            } else {
+                throw new RedisClientException("不支持对多节点Sharded模式进行evalsha操作");
+            }
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public Object evalsha(String sha1, int keyCount, String... params) {
+        ShardedJedis jedis = null;
+        try {
+            jedis = getJedis();
+            Collection<Jedis> shards = jedis.getAllShards();
+            if (shards.size() == 1) {
+                return shards.iterator().next().evalsha(sha1, keyCount,params);
+            } else {
+                throw new RedisClientException("不支持对多节点Sharded模式进行evalsha操作");
+            }
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public Boolean scriptExists(String sha1) {
+        ShardedJedis jedis = null;
+        try {
+            jedis = getJedis();
+            Collection<Jedis> shards = jedis.getAllShards();
+            if (shards.size() == 1) {
+                return shards.iterator().next().scriptExists(sha1);
+            } else {
+                throw new RedisClientException("不支持对多节点Sharded模式进行scriptExists操作");
+            }
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public List<Boolean> scriptExists(String... sha1) {
+        ShardedJedis jedis = null;
+        try {
+            jedis = getJedis();
+            Collection<Jedis> shards = jedis.getAllShards();
+            if (shards.size() == 1) {
+                return shards.iterator().next().scriptExists(sha1);
+            } else {
+                throw new RedisClientException("不支持对多节点Sharded模式进行scriptExists操作");
+            }
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public String scriptLoad(String script) {
+        ShardedJedis jedis = null;
+        try {
+            jedis = getJedis();
+            Collection<Jedis> shards = jedis.getAllShards();
+            if (shards.size() == 1) {
+                return shards.iterator().next().scriptLoad(script);
+            } else {
+                throw new RedisClientException("不支持对多节点Sharded模式进行scriptLoad操作");
+            }
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
 }

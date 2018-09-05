@@ -21,6 +21,7 @@ import java.util.Set;
 import me.lucas.kits.orm.redis.jedis.commands.HashRedisClient;
 import me.lucas.kits.orm.redis.jedis.commands.KeyValueRedisClient;
 import me.lucas.kits.orm.redis.jedis.commands.ListRedisClient;
+import me.lucas.kits.orm.redis.jedis.commands.ScriptingCommands;
 import me.lucas.kits.orm.redis.jedis.commands.SetRedisClient;
 import me.lucas.kits.orm.redis.jedis.commands.SortedSetRedisClient;
 import me.lucas.kits.orm.redis.jedis.config.RedisConfig;
@@ -35,7 +36,8 @@ import me.lucas.kits.orm.redis.jedis.config.RedisConfig;
  * @since 1.0
  */
 public interface RedisClient
-        extends KeyValueRedisClient, HashRedisClient, ListRedisClient, SetRedisClient, SortedSetRedisClient {
+        extends KeyValueRedisClient, HashRedisClient, ListRedisClient, SetRedisClient, SortedSetRedisClient,
+        ScriptingCommands {
     enum Mark {
         /** 从列表的左端读取元素 */
         LPOP,
