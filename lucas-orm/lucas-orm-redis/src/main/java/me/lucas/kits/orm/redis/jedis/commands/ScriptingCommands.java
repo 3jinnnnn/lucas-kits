@@ -1,5 +1,8 @@
 package me.lucas.kits.orm.redis.jedis.commands;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * Created by zhangxin on 2018/9/5-上午11:19.
  *
@@ -13,13 +16,17 @@ public interface ScriptingCommands extends redis.clients.jedis.ScriptingCommands
         /** 更新时存入缓存 */UPDATE
     }
 
+    @Getter
+    @AllArgsConstructor
     enum ResultType {
-        /** 成功: 缓存不存在, 缓存刷入 */SUCCESS_SAVE,
-        /** 成功: 缓存存在, 比较缓存不存在, 缓存更新 */SUCCESS_REFRESH,
-        /** 成功: 缓存存在, 比较缓存存在, 当前版本超前, 缓存更新 */SUCCESS_NEWER_REFRESH,
-        /** 失败: 缓存存在, 比较缓存存在, 当前版本落后, 缓存未更新 */UNSUCCESS_OLDER,
-        /** 失败: 缓存存在, 比较缓存存在, 当前非UPDATE, 缓存不能更新 */UNSUCCESS_CAN_NOT,
-        /** 失败: 更新时失败 */UNSUCCESS_ERROR,
+        /** 成功: 缓存不存在, 缓存刷入 */SUCCESS_SAVE(true),
+        /** 成功: 缓存存在, 比较缓存不存在, 缓存更新 */SUCCESS_REFRESH(true),
+        /** 成功: 缓存存在, 比较缓存存在, 当前版本超前, 缓存更新 */SUCCESS_NEWER_REFRESH(true),
+        /** 失败: 缓存存在, 比较缓存存在, 当前版本落后, 缓存未更新 */UNSUCCESS_OLDER(false),
+        /** 失败: 缓存存在, 比较缓存存在, 当前非UPDATE, 缓存不能更新 */UNSUCCESS_CAN_NOT(false),
+        /** 失败: 更新时失败 */UNSUCCESS_ERROR(false);
+
+        private boolean success;
     }
 
     /**
