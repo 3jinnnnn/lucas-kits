@@ -11,5 +11,5 @@ import org.springframework.context.annotation.ImportResource;
  */
 @Configuration
 @ImportResource(value = { "classpath:spring-properties.xml"})
-public class TestConfig {
+public class SpringConfig {
 }

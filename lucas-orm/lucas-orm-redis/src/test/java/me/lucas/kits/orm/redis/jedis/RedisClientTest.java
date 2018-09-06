@@ -22,7 +22,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 //此注解用来加载配置ApplicationContext
-@ContextConfiguration(classes = { RedisClientConfig.class, TestConfig.class })
+@ContextConfiguration(classes = { RedisClientConfig.class, SpringConfig.class })
 @WebAppConfiguration
 public class RedisClientTest {
 

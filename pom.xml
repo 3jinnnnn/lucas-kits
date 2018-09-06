@@ -10,9 +10,10 @@
   <modules>
     <module>lucas-commons</module>
     <module>lucas-orm</module>
+    <module>lucas-rpc</module>
   </modules>
 
-  <name>Lucas Kits</name>
+  <name>lucas-kits</name>
   <url>http://maven.apache.org/</url>
   <inceptionYear>2001</inceptionYear>
 

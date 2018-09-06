@@ -10,7 +10,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>lucas-orm-redisson</artifactId>
-  <name>Lucas Orm Redisson</name>
+  <name>lucas-orm-redisson</name>
   <version>1.0-SNAPSHOT</version>
 
   <properties>

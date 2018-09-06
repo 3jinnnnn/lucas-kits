@@ -10,7 +10,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>lucas-orm-ractivemq</artifactId>
-  <name>Lucas Orm ActiveMQ</name>
+  <name>lucas-orm-activemq</name>
 
   <dependencies>
     <dependency>
