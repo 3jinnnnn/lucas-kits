@@ -1,6 +1,6 @@
 package me.lucas.kits.rpc.dubbo.provider;
 
-import me.lucas.kits.rpc.dubbo.provider.DemoService;
+import me.lucas.kits.rpc.dubbo.api.DemoService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
  * @version 1.0
  */
 @Service
-@com.alibaba.dubbo.config.annotation.Service(timeout = 5000)
 public class DemoServiceImpl implements DemoService {
     @Override
     public String sayHello(String name) {

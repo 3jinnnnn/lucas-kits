@@ -1,4 +1,4 @@
-package me.lucas.kits.rpc.dubbo.provider;
+package me.lucas.kits.rpc.dubbo.api;
 
 /**
  * Created by zhangxin on 2018/9/5-下午8:16.

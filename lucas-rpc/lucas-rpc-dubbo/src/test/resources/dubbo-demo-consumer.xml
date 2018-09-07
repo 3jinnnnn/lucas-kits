@@ -31,6 +31,6 @@
     <dubbo:protocol name="dubbo" port="20880"/>
 
     <!-- declare the service interface to be exported -->
-    <dubbo:reference interface="me.lucas.kits.rpc.dubbo.provider.DemoService"/>
+    <dubbo:reference interface="me.lucas.kits.rpc.dubbo.api.DemoService"/>
 
 </beans>

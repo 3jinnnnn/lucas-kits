@@ -4,7 +4,7 @@ import com.alibaba.dubbo.config.spring.context.annotation.DubboComponentScan;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import me.lucas.kits.rpc.dubbo.Provider.ProviderConfig;
-import me.lucas.kits.rpc.dubbo.provider.DemoService;
+import me.lucas.kits.rpc.dubbo.api.DemoService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

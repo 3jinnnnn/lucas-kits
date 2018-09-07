@@ -4,7 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.spring.context.annotation.DubboComponentScan;
 import lombok.extern.slf4j.Slf4j;
 import me.lucas.kits.rpc.dubbo.Consumer.ConsumerConfig;
-import me.lucas.kits.rpc.dubbo.provider.DemoService;
+import me.lucas.kits.rpc.dubbo.api.DemoService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.Configuration;
