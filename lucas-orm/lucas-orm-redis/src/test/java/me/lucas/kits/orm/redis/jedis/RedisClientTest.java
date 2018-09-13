@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import redis.clients.jedis.Jedis;
 
 /**
  * Created by zhangxin on 2018/4/13-下午1:50.
@@ -35,5 +36,8 @@ public class RedisClientTest {
         Properties properties = PropertiesLoader.load("redis.properties");
         log.info(JSON.toJSONString(properties));
         log.info(redis.get("123"));
+        redis.pfadd("pfkey", "1", "2");
+        redis.pfcount("pfkey");
+        redis.pfmerge("pfkey","pfkey2");
     }
 }

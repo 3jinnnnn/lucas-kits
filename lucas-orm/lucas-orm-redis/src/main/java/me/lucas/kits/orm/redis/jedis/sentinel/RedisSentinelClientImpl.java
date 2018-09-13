@@ -2242,4 +2242,56 @@ public class RedisSentinelClientImpl extends AbstractSentinelRedisClient {
             close(jedis);
         }
     }
+
+    @Override
+    public Long pfadd(String key, String... elements) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            return jedis.pfadd(key, elements);
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public boolean pfmerge(String destkey, String... sourcekeys) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            return isOK(jedis.pfmerge(destkey, sourcekeys));
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public long pfcount(String key) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            return jedis.pfcount(key);
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public long pfcount(String... keys) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            return jedis.pfcount(keys);
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
 }

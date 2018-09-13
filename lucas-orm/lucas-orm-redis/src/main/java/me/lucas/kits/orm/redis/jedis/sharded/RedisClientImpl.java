@@ -2425,4 +2425,76 @@ public class RedisClientImpl extends AbstractRedisClient {
             close(jedis);
         }
     }
+
+    @Override
+    public Long pfadd(String key, String... elements) {
+        ShardedJedis jedis = null;
+        try {
+            jedis = getJedis();
+            Collection<Jedis> shards = jedis.getAllShards();
+            if (shards.size() == 1) {
+                return shards.iterator().next().pfadd(key, elements);
+            } else {
+                throw new RedisClientException("不支持对多节点Sharded模式进行pfadd操作");
+            }
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public boolean pfmerge(String destkey, String... sourcekeys) {
+        ShardedJedis jedis = null;
+        try {
+            jedis = getJedis();
+            Collection<Jedis> shards = jedis.getAllShards();
+            if (shards.size() == 1) {
+                return isOK(shards.iterator().next().pfmerge(destkey, sourcekeys));
+            } else {
+                throw new RedisClientException("不支持对多节点Sharded模式进行pfmerge操作");
+            }
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public long pfcount(String key) {
+        ShardedJedis jedis = null;
+        try {
+            jedis = getJedis();
+            Collection<Jedis> shards = jedis.getAllShards();
+            if (shards.size() == 1) {
+                return shards.iterator().next().pfcount(key);
+            } else {
+                throw new RedisClientException("不支持对多节点Sharded模式进行pfcount操作");
+            }
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public long pfcount(String... keys) {
+        ShardedJedis jedis = null;
+        try {
+            jedis = getJedis();
+            Collection<Jedis> shards = jedis.getAllShards();
+            if (shards.size() == 1) {
+                return shards.iterator().next().pfcount(keys);
+            } else {
+                throw new RedisClientException("不支持对多节点Sharded模式进行pfcount操作");
+            }
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
 }

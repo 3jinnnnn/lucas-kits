@@ -149,4 +149,34 @@ public interface RedisClient
      */
     Set<String> keys(String pattern);
 
+    /**
+     * 添加指定元素到 HyperLogLog 中.
+     * @param key KEY
+     * @param elements 元素
+     * @return 成功条数, 批量插入时为1
+     */
+    Long pfadd(final String key, final String... elements);
+
+    /**
+     * 将多个 HyperLogLog 合并为一个 HyperLogLog.
+     * @param destkey 目标KEY
+     * @param sourcekeys SOURCE KEY
+     * @return 是否成功
+     */
+    boolean pfmerge(final String destkey, final String... sourcekeys);
+
+    /**
+     * 返回给定 HyperLogLog 的基数估算值。
+     * @param key KEY
+     * @return count
+     */
+    long pfcount(final String key);
+
+    /**
+     * 返回给定 HyperLogLog 的基数估算值。
+     * @param keys KEYs
+     * @return count
+     */
+    long pfcount(final String... keys);
+
 }

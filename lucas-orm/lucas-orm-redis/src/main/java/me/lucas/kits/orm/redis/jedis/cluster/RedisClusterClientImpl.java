@@ -19,6 +19,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.AbstractMap;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +36,11 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.BinaryClient.LIST_POSITION;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
+import redis.clients.jedis.ShardedJedis;
 import redis.clients.jedis.Tuple;
 import redis.clients.jedis.exceptions.JedisClusterException;
 
@@ -1576,5 +1579,41 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     @Override
     public String scriptLoad(String script) {
         return cluster.scriptLoad(script, null);
+    }
+
+    @Override
+    public Long pfadd(String key, String... elements) {
+        try {
+            return cluster.pfadd(key, elements);
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public boolean pfmerge(String destkey, String... sourcekeys) {
+        try {
+            return isOK(cluster.pfmerge(destkey, sourcekeys));
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public long pfcount(String key) {
+        try {
+            return cluster.pfcount(key);
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public long pfcount(String... keys) {
+        try {
+            return cluster.pfcount(keys);
+        } catch (Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        }
     }
 }
