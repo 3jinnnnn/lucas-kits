@@ -80,4 +80,59 @@ public interface ScriptingCommands extends redis.clients.jedis.ScriptingCommands
     ResultType refreshCache(String key, String value, long ttl, RefreshType refreshType, long timestamp,
             long refreshTtl);
 
+    /**
+     * 刷入缓存.
+     * 刷新类型使用 {@link RefreshType#SELECT}
+     *
+     * @param key   Redis Key
+     * @param field Redis field
+     * @param value Redis Value
+     * @param ttl   缓存过期时间
+     * @return ResultType
+     */
+    ResultType refreshHashCache(String key, String field, String value, long ttl);
+
+    /**
+     * 刷入缓存.
+     * 指定刷新类型
+     *
+     * @param key         Redis Key
+     * @param field       Redis field
+     * @param value       Redis Value
+     * @param ttl         缓存过期时间
+     * @param refreshType 刷新类型
+     * @return ResultType
+     */
+    ResultType refreshHashCache(String key, String field, String value, long ttl, RefreshType refreshType);
+
+    /**
+     * 刷入缓存.
+     *
+     * @param key         Redis Key
+     * @param field       Redis field
+     * @param value       Redis Value
+     * @param ttl         缓存过期时间
+     * @param refreshType 刷新类型
+     * @param timestamp   操作时间, 用于比较缓存
+     * @param refreshTtl  比较缓存过期时间, 默认60s
+     * @return ResultType
+     */
+    ResultType refreshHashCache(String key, String field, String value, long ttl, RefreshType refreshType,
+            String timestamp, long refreshTtl);
+
+    /**
+     * 刷入缓存.
+     *
+     * @param key         Redis Key
+     * @param field       Redis field
+     * @param value       Redis Value
+     * @param ttl         缓存过期时间
+     * @param refreshType 刷新类型
+     * @param timestamp   操作时间, 用于比较缓存
+     * @param refreshTtl  比较缓存过期时间, 默认60s
+     * @return ResultType
+     */
+    ResultType refreshHashCache(String key, String field, String value, long ttl, RefreshType refreshType,
+            long timestamp, long refreshTtl);
+
 }

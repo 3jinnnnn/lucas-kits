@@ -58,7 +58,7 @@ import redis.clients.jedis.ScanResult;
  */
 @Slf4j
 @NoArgsConstructor
-public abstract class AbstractSentinelRedisClient implements RedisClient {
+public abstract class AbstractSentinelRedisClient extends AbstractRefreshCacheScript implements RedisClient {
 
     /** 默认分隔符 */
     public static final String DEFAULT_SEPARATOR = ",";
@@ -84,23 +84,6 @@ public abstract class AbstractSentinelRedisClient implements RedisClient {
      * @since 1.4.10
      */
     public static final ScanParams DEFAULT_SCAN_PARAMS = new ScanParams();
-
-    public static String REFRESH_CACHE_SCRIPT;
-
-    static {
-        File file = null;
-        StringBuilder sb = new StringBuilder();
-        try (InputStream is = AbstractRedisClient.class.getClassLoader().getResourceAsStream("CompareAndCache.lua");
-                BufferedReader br = new BufferedReader(new InputStreamReader(is, Charsets.UTF_8));) {
-            String s;
-            while ((s = br.readLine()) != null) {
-                sb.append(s).append('\n');
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-        REFRESH_CACHE_SCRIPT = sb.toString();
-    }
 
     @Getter
     @Setter
@@ -1280,48 +1263,4 @@ public abstract class AbstractSentinelRedisClient implements RedisClient {
         return new ScanResult<>(result.getStringCursor(), newEntrys);
     }
 
-    @Override
-    public ResultType refreshCache(String key, String value, long ttl) {
-        try {
-            Object eval = eval(REFRESH_CACHE_SCRIPT, 1, key, value, String.valueOf(ttl), RefreshType.SELECT.name());
-            return ResultType.valueOf(eval.toString());
-        } catch (Exception e) {
-            return ResultType.UNSUCCESS_ERROR;
-        }
-    }
-
-    @Override
-    public ResultType refreshCache(String key, String value, long ttl, RefreshType refreshType) {
-        try {
-            Object eval = eval(REFRESH_CACHE_SCRIPT, 1, key, value, String.valueOf(ttl), refreshType.name(),
-                    String.valueOf(System.currentTimeMillis()), "60");
-            return ResultType.valueOf(eval.toString());
-        } catch (Exception e) {
-            return ResultType.UNSUCCESS_ERROR;
-        }
-    }
-
-    @Override
-    public ResultType refreshCache(String key, String value, long ttl, RefreshType refreshType, String timestamp,
-            long refreshTtl) {
-        try {
-            Object eval = eval(REFRESH_CACHE_SCRIPT, 1, key, value, String.valueOf(ttl), refreshType.name(), timestamp,
-                    String.valueOf(refreshTtl));
-            return ResultType.valueOf(eval.toString());
-        } catch (Exception e) {
-            return ResultType.UNSUCCESS_ERROR;
-        }
-    }
-
-    @Override
-    public ResultType refreshCache(String key, String value, long ttl, RefreshType refreshType, long timestamp,
-            long refreshTtl) {
-        try {
-            Object eval = eval(REFRESH_CACHE_SCRIPT, 1, key, value, String.valueOf(ttl), refreshType.name(),
-                    String.valueOf(timestamp), String.valueOf(refreshTtl));
-            return ResultType.valueOf(eval.toString());
-        } catch (Exception e) {
-            return ResultType.UNSUCCESS_ERROR;
-        }
-    }
 }
