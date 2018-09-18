@@ -9,6 +9,7 @@ ARGV5: [可选，默认60s] 操作校验有效时间， (e.g. 60)
 --]]
 
 local result
+local compareCacheKey = 'LUA_COMPARE_CACHE@KEY[' .. KEYS[1] .. ']'
 -- 判断key是否存在
 local exist = redis.call('exists', KEYS[1])
 
@@ -18,24 +19,24 @@ if exist == 0 then
     result = 'SUCCESS_SAVE'
     if ARGV[3] ~= nil and ARGV[3] == 'UPDATE' then
         -- 如果当前操作为UPDATE类型, 同时写入比较缓存
-        redis.call('setex', KEYS[1] .. '_LUA_COMPARE_CACHE', ARGV[5], ARGV[4])
+        redis.call('setex', compareCacheKey, ARGV[5], ARGV[4])
     end
 else
     -- key存在时判断是否可更新缓存
-    local compareCache = redis.call('get', KEYS[1] .. '_LUA_COMPARE_CACHE')
+    local compareCache = redis.call('get', compareCacheKey)
     if compareCache == false then
         -- 比较缓存不存在, 直接写入
         result = redis.call('setex', KEYS[1], ARGV[2], ARGV[1])
         result = 'SUCCESS_REFRESH'
         if ARGV[3] ~= nil and ARGV[3] == 'UPDATE' then
             -- 如果当前操作为UPDATE类型, 同时写入比较缓存
-            redis.call('setex', KEYS[1] .. '_LUA_COMPARE_CACHE', ARGV[5], ARGV[4])
+            redis.call('setex', compareCacheKey, ARGV[5], ARGV[4])
         end
     elseif ARGV[3] == 'UPDATE' and compareCache < ARGV[4] then
         if compareCache < ARGV[4] then
             -- 当前操作时间在比较缓存时间之后, 允许覆盖写入缓存
             result = redis.call('setex', KEYS[1], ARGV[2], ARGV[1])
-            redis.call('setex', KEYS[1] .. '_LUA_COMPARE_CACHE', ARGV[5], ARGV[4])
+            redis.call('setex', compareCacheKey, ARGV[5], ARGV[4])
             result = 'SUCCESS_NEWER_REFRESH'
         else
             result = 'UNSUCCESS_OLDER'

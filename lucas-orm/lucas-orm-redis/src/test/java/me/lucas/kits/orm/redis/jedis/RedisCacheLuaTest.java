@@ -7,8 +7,10 @@ import me.lucas.kits.orm.redis.jedis.commands.ScriptingCommands.ResultType;
 import me.lucas.kits.orm.redis.jedis.config.RedisClientConfig;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,6 +28,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 //此注解用来加载配置ApplicationContext
 @ContextConfiguration(classes = { RedisClientConfig.class, SpringConfig.class })
 @WebAppConfiguration
+@FixMethodOrder(MethodSorters.JVM)
 public class RedisCacheLuaTest {
     private static final String VALUE1 = "VALUE1";
     private static final String VALUE2 = "VALUE2";
