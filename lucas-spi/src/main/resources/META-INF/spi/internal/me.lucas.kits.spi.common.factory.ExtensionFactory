@@ -1,0 +1,2 @@
+adaptive=me.lucas.kits.spi.common.factory.AdaptiveExtensionFactory
+spi=me.lucas.kits.spi.common.SpiExtensionFactory

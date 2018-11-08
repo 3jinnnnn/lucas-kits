@@ -11,6 +11,7 @@
     <module>lucas-commons</module>
     <module>lucas-orm</module>
     <module>lucas-rpc</module>
+    <module>lucas-spi</module>
   </modules>
 
   <name>lucas-kits</name>

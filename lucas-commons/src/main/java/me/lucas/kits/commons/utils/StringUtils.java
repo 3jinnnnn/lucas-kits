@@ -15,6 +15,7 @@
  */
 package me.lucas.kits.commons.utils;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,6 +30,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
+import me.lucas.kits.commons.io.UnsafeStringWriter;
 
 /**
  * Miscellaneous {@link String} utility methods.
@@ -1388,6 +1390,43 @@ public abstract class StringUtils extends org.apache.commons.lang3.StringUtils {
             return Integer.parseInt(str);
         } catch (final NumberFormatException nfe) {
             return defaultValue;
+        }
+    }
+
+    /**
+     * @param e
+     * @return string
+     */
+    public static String toString(Throwable e) {
+        UnsafeStringWriter w = new UnsafeStringWriter();
+        PrintWriter p = new PrintWriter(w);
+        p.print(e.getClass().getName());
+        if (e.getMessage() != null) {
+            p.print(": " + e.getMessage());
+        }
+        p.println();
+        try {
+            e.printStackTrace(p);
+            return w.toString();
+        } finally {
+            p.close();
+        }
+    }
+
+    /**
+     * @param msg
+     * @param e
+     * @return string
+     */
+    public static String toString(String msg, Throwable e) {
+        UnsafeStringWriter w = new UnsafeStringWriter();
+        w.write(msg + "\n");
+        PrintWriter p = new PrintWriter(w);
+        try {
+            e.printStackTrace(p);
+            return w.toString();
+        } finally {
+            p.close();
         }
     }
 }
