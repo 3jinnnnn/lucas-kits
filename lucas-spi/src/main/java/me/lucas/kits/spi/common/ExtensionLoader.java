@@ -32,10 +32,10 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import me.lucas.kits.commons.utils.StringUtils;
-import me.lucas.kits.spi.common.compiler.Compiler;
 import me.lucas.kits.spi.common.factory.ExtensionFactory;
 import me.lucas.kits.spi.utils.ConcurrentHashSet;
 import me.lucas.kits.spi.utils.Holder;
+import me.lucas.kits.spi.utils.SpringContextHolder;
 
 /**
  * Load dubbo extensions
@@ -291,7 +291,9 @@ public class ExtensionLoader<T> {
         try {
             T instance = (T) EXTENSION_INSTANCES.get(clazz);
             if (instance == null) {
-                EXTENSION_INSTANCES.putIfAbsent(clazz, clazz.newInstance());
+                Object bean = SpringContextHolder.getApplicationContext().getBean(clazz);
+                EXTENSION_INSTANCES.putIfAbsent(clazz, bean);
+//                EXTENSION_INSTANCES.putIfAbsent(clazz, clazz.newInstance());
                 instance = (T) EXTENSION_INSTANCES.get(clazz);
             }
             injectExtension(instance);
