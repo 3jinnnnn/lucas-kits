@@ -65,6 +65,8 @@ import redis.clients.util.Sharded;
 public class RedisClientConfig implements ApplicationContextAware {
     /** Redis配置文件路径 */
     public static final String MAIN_REDIS = "/redis.properties";
+    public static final String MAIN_REDIS_PRIFIX = "config/resource/redis/redis_";
+    public static final String MAIN_REDIS_SUFFIX = ".properties";
     public static final String POOL_PRIFIX = "pool:";
     public static final String REDIS_PRIFIX = "redis:";
 
@@ -87,7 +89,13 @@ public class RedisClientConfig implements ApplicationContextAware {
 
     @PostConstruct
     public void init() {
-        Properties properties = PropertiesLoader.load(MAIN_REDIS);
+        Properties properties = null;
+        try {
+            properties = PropertiesLoader.load(MAIN_REDIS);
+        } catch (Exception e) {
+            properties = PropertiesLoader.load(MAIN_REDIS_PRIFIX + System.getProperty("envName") + MAIN_REDIS_SUFFIX);
+        }
+
         try {
             initRedisConfig(properties);
             BEAN_FACTORY = (DefaultListableBeanFactory) ((ConfigurableApplicationContext) APPLICATION_CONTEXT)
