@@ -15,12 +15,25 @@ import javax.validation.Validator;
  */
 public class BeanValidatorUtils {
 
+    enum OutputType {
+        /** 参数,错误信息 MAP */MAP,
+        /** 所有错误信息 */ALL_STRING,
+        /** 单一错误信息 */SIMPLE_STRING,
+    }
+
     /**
      * 验证某个bean的参数, 若校验通过则输出null对象.
      *
      * @param object 被校验的参数
      */
     public static <T> String validate(T object, Class<?>... groups) {
+        return validate(object, OutputType.SIMPLE_STRING, groups);
+    }
+
+    public static <T> String validate(T object, OutputType outputType, Class<?>... groups) {
+        if (outputType == null) {
+            outputType = OutputType.SIMPLE_STRING;
+        }
         //获得验证器
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         //执行验证
@@ -29,8 +42,18 @@ public class BeanValidatorUtils {
         if (CollectionUtils.isEmpty(constraintViolations)) {
             return null;
         } else {
-            return convertErrorMsg(constraintViolations);
+            switch (outputType) {
+            case MAP:
+                return convertErrorMsg(constraintViolations);
+            case ALL_STRING:
+                return convertErrorMsgAllString(constraintViolations);
+            case SIMPLE_STRING:
+                return convertErrorMsgSimpleString(constraintViolations);
+            default:
+                return convertErrorMsgSimpleString(constraintViolations);
+            }
         }
+
     }
 
     /**
@@ -51,5 +74,33 @@ public class BeanValidatorUtils {
             }
         }
         return errorMap.toString();
+    }
+
+    /**
+     * 转换异常信息
+     */
+    private static <T> String convertErrorMsgAllString(Set<ConstraintViolation<T>> cvs) {
+        StringBuilder sb = new StringBuilder();
+        String property;
+        for (ConstraintViolation<T> cv : cvs) {
+            if (sb.length() != 0) {
+                sb.append(",");
+            }
+            sb.append(cv.getMessage());
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 转换异常信息
+     */
+    private static <T> String convertErrorMsgSimpleString(Set<ConstraintViolation<T>> cvs) {
+        StringBuilder sb = new StringBuilder();
+        String property;
+        for (ConstraintViolation<T> cv : cvs) {
+            sb.append(cv.getMessage());
+            break;
+        }
+        return sb.toString();
     }
 }
