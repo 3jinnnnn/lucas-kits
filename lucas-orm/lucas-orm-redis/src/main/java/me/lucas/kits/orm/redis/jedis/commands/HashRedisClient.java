@@ -166,6 +166,17 @@ public interface HashRedisClient {
     boolean hmset(String key, Map<String, Object> map);
 
     /**
+     * 同时将多个 field-value (域-值)对设置到哈希表 key 中。<br>
+     * 此命令会覆盖哈希表中已存在的域。<br>
+     * 如果 key 不存在，一个空哈希表被创建并执行 HMSET 操作。<br>
+     *
+     * @param key 哈希表Key
+     * @param map 数据对象映射表
+     * @return Return OK or Exception if hash is empty
+     */
+    boolean hmset(String key, Map<String, Object> map, Integer ttl);
+
+    /**
      * 将哈希表 key 中的域 field 的值设置为 value ，当且仅当域 field 不存在。<br>
      * 若域 field 已经存在，该操作无效。<br>
      * 如果 key 不存在，一个新哈希表被创建并执行 HSETNX 命令。<br>

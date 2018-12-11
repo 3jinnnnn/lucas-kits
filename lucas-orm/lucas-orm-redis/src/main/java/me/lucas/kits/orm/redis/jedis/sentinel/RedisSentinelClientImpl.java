@@ -641,6 +641,29 @@ public class RedisSentinelClientImpl extends AbstractSentinelRedisClient {
     }
 
     @Override
+    public boolean hmset(String key, Map<String, Object> map, Integer ttl) {
+        Assert.hasText(key);
+        Assert.notEmpty(map);
+        Assert.notNull(ttl);
+
+        Jedis jedis = null;
+        try {
+            final Map<String, String> newMap = Maps.newHashMap();
+            map.forEach((field, value) -> newMap.put(field, toJSONString(value)));
+            jedis = getJedis();
+            final Pipeline pipeline = jedis.pipelined();
+            pipeline.hmset(key, newMap);
+            pipeline.expire(key, ttl);
+            pipeline.sync();
+            return true;
+        } catch (final Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
     public boolean hsetByNX(final String key, final String field, final String value) {
         Assert.hasText(key);
         Assert.hasText(field);

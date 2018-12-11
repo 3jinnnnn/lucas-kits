@@ -41,6 +41,7 @@ import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 import redis.clients.jedis.ShardedJedis;
+import redis.clients.jedis.ShardedJedisPipeline;
 import redis.clients.jedis.Tuple;
 import redis.clients.jedis.exceptions.JedisClusterException;
 
@@ -447,6 +448,23 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
             final Map<String, String> newMap = Maps.newHashMap();
             map.forEach((field, value) -> newMap.put(field, toJSONString(value)));
             return isOK(cluster.hmset(key, newMap));
+        } catch (final Throwable e) {
+            throw new RedisClientException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public boolean hmset(String key, Map<String, Object> map, Integer ttl) {
+        Assert.hasText(key);
+        Assert.notEmpty(map);
+        Assert.notNull(ttl);
+
+        try {
+            final Map<String, String> newMap = Maps.newHashMap();
+            map.forEach((field, value) -> newMap.put(field, toJSONString(value)));
+            cluster.hmset(key, newMap);
+            cluster.expire(key, ttl);
+            return true;
         } catch (final Throwable e) {
             throw new RedisClientException(e.getMessage(), e);
         }
