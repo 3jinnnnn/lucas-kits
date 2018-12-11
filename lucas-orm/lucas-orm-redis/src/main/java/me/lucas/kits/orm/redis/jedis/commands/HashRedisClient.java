@@ -174,7 +174,7 @@ public interface HashRedisClient {
      * @param map 数据对象映射表
      * @return Return OK or Exception if hash is empty
      */
-    boolean hmset(String key, Map<String, Object> map, Integer ttl);
+    boolean hmsetEX(String key, Map<String, Object> map, Integer ttl);
 
     /**
      * 将哈希表 key 中的域 field 的值设置为 value ，当且仅当域 field 不存在。<br>

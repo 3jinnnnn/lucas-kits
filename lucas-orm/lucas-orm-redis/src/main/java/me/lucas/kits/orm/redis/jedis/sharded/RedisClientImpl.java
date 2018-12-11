@@ -670,7 +670,7 @@ public class RedisClientImpl extends AbstractRedisClient {
     }
 
     @Override
-    public boolean hmset(String key, Map<String, Object> map, Integer ttl) {
+    public boolean hmsetEX(String key, Map<String, Object> map, Integer ttl) {
         Assert.hasText(key);
         Assert.notEmpty(map);
         Assert.notNull(ttl);

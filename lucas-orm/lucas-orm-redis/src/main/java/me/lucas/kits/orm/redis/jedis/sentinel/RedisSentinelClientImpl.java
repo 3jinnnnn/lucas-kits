@@ -641,7 +641,7 @@ public class RedisSentinelClientImpl extends AbstractSentinelRedisClient {
     }
 
     @Override
-    public boolean hmset(String key, Map<String, Object> map, Integer ttl) {
+    public boolean hmsetEX(String key, Map<String, Object> map, Integer ttl) {
         Assert.hasText(key);
         Assert.notEmpty(map);
         Assert.notNull(ttl);

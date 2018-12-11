@@ -46,7 +46,7 @@ public class HashRedisClientTest {
     public void hmsetEX() {
         Map<String, Object> map = Stream.iterate(2, x -> x + 1).limit(40).map(UserVerifyRecord::new)
                 .collect(Collectors.toMap(x -> String.valueOf(x.getProductId()), y -> y));
-        redis.hmset("HMSET_KEY", map, 3600);
+        redis.hmsetEX("HMSET_KEY", map, 3600);
     }
 
     @Test

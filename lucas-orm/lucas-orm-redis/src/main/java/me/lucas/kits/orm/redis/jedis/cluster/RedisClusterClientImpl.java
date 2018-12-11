@@ -454,7 +454,7 @@ public class RedisClusterClientImpl extends AbstractRedisClient implements Redis
     }
 
     @Override
-    public boolean hmset(String key, Map<String, Object> map, Integer ttl) {
+    public boolean hmsetEX(String key, Map<String, Object> map, Integer ttl) {
         Assert.hasText(key);
         Assert.notEmpty(map);
         Assert.notNull(ttl);
